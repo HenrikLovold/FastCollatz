@@ -1,4 +1,4 @@
-
+import time
 
 def collatz_next(x):
 	if x % 2 == 0:
@@ -17,5 +17,8 @@ def collatz(x):
 
 if __name__ == "__main__":
 	N = 1_000_000 # I wouldn't dare run this with 1*10**7
+	start = time.time()
 	for i in range(2, N):
 		collatz(i)
+	run_time = time.time() - start
+	print("Time to run", N, "numbers was:", round(run_time, 3), "seconds.")
