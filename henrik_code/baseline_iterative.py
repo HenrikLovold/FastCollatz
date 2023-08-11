@@ -1,10 +1,10 @@
 import time
+from sys import argv
 
 def collatz_next(x):
 	if x % 2 == 0:
 		return x//2
-	else:
-		return x*3 + 1
+	return x*3 + 1
 
 def collatz(x):
 	path_len = 0
@@ -16,9 +16,13 @@ def collatz(x):
 
 
 if __name__ == "__main__":
-	N = 1_000_000 # I wouldn't dare run this with 1*10**7
+	try:
+		N = int(argv[1])
+	except:
+		print("Program takes exactly ONE parameter: N")
+		quit(1)
 	start = time.time()
-	for i in range(2, N):
+	for i in range(2, N+1):
 		collatz(i)
 	run_time = time.time() - start
-	print("Time to run", N, "numbers was:", round(run_time, 3), "seconds.")
+	print("Time to run", N, "numbers:", int(round(run_time, 3)*1000), "ms")
