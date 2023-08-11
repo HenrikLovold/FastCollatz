@@ -15,6 +15,7 @@ Compute the length of all Collatz paths for numbers 2 to N as fast as possible. 
 | 5  | 5  |
 | 6  | 8  |
 
+If you need an example program, have a look at [this file](https://github.com/henrik2706/FastCollatz/blob/main/henrik_code/baseline_iterative.py).
 
 #### Basic Collatz function
 ```python
