@@ -11,7 +11,7 @@ Compute the length of all Collatz paths for numbers 2 to N as fast as possible. 
 |---|---|
 | 2  | 1  |
 | 3  | 7  |
-| 4  | 3  |
+| 4  | 2  |
 | 5  | 5  |
 | 6  | 8  |
 
