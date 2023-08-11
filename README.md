@@ -2,10 +2,12 @@
 Can you make it fast?
 
 #### Basic Collatz function:
-```
+```python
 collatz(x):
-  return x/2 if x%2 == 0
-  return x*3 + 1 if x%2 == 1
+  if x % 2 == 0:
+    return x / 2
+  else:
+    return x*3 + 1
 ```
 
 #### Rules
