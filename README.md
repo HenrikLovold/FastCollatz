@@ -1,7 +1,7 @@
 # FastCollatz
 Can you make it fast?
 
-#### Basic Collatz function:
+#### Basic Collatz function
 ```python
 collatz(x):
   if x % 2 == 0:
