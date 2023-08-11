@@ -1,4 +1,5 @@
 from decimal import Decimal
+from sys import argv
 import time
 
 
@@ -29,16 +30,27 @@ class Collatz:
         return self.collatz(n, i+1)
 
 if __name__ == "__main__":
+    # Make singleton object
     c = Collatz()
-    N = 10000000
+
+    # Check argv and set N
+    try:
+        N = int(argv[1])
+    except:
+        print("Program takes exactly ONE parameter: N")
+        quit(1)
+
+    # Timer and main loop
     start = time.time()
     for n in range(1, N):
         c.collatz(n, 0)
     end = time.time()-start
-    end = round(end, 3)
-    print("Calculated", f"{Decimal(N):.1E}", "values of collatz in", end, "seconds.")
+
+    # Calculate exec time and print
+    exectime = int(round(end, 3) * 1000)
+    print("Time to run", N, "numbers:", exectime, "ms")
     
-    # Plot stuff, just go for True...
+    # Plot stuff, just go for False...
     plot = False
     if plot:
         import matplotlib.pyplot as plt

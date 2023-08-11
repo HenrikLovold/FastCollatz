@@ -16,13 +16,17 @@ def collatz(x):
 
 
 if __name__ == "__main__":
+	# Check argv and set N
 	try:
 		N = int(argv[1])
 	except:
 		print("Program takes exactly ONE parameter: N")
 		quit(1)
+
+	# Timer and main loop
 	start = time.time()
 	for i in range(2, N+1):
 		collatz(i)
 	run_time = time.time() - start
+	
 	print("Time to run", N, "numbers:", int(round(run_time, 3)*1000), "ms")
