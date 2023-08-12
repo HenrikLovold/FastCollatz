@@ -24,7 +24,7 @@ number of cores. Have fun!
 */
 
 void collatzThread(int64_t from, int64_t to, uint threadID);
-int64_t collatzNext(int64_t x);
+int64_t collatzNext(int64_t x, int& shiftcounter);
 int64_t collatz(int64_t x);
 
 int64_t *memo;
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
         threads.push_back(std::thread(collatzThread, from, to, i));
     }
     int lastFrom = nThreads != 1 ? (nThreads-1)*numPerThread : 2;
-    int lastTo = N;
+    int lastTo = N-1;
     threads.push_back(std::thread(collatzThread, lastFrom, lastTo, nThreads));
 
     for (int i = 0; i < threads.size(); i++) {
@@ -96,23 +96,28 @@ void collatzThread(int64_t from, int64_t to, uint threadID) {
 }
 
 int64_t collatz(int64_t x) {
+    int shiftcounter = 0;
     int64_t pathLen = 0;
-    int64_t nextX = collatzNext(x);
+    int64_t nextX = collatzNext(x, shiftcounter);
+    pathLen += shiftcounter;
     while (nextX != 1) {
         if (nextX < N && memo[nextX] != 0) {
-            memo[x] = pathLen + memo[nextX] + 1;
-            return pathLen + memo[nextX] + 1;
+            memo[x] = pathLen + memo[nextX];
+            return pathLen + memo[nextX];
         }
-        pathLen++;
-        nextX = collatzNext(nextX);
+        nextX = collatzNext(nextX, shiftcounter);
+        pathLen += shiftcounter;
     }
-    memo[x] = pathLen+1;
-    return pathLen+1;
+    memo[x] = pathLen;
+    return pathLen;
 }
 
-int64_t collatzNext(int64_t x) {
+int64_t collatzNext(int64_t x, int& shiftcounter) {
+    uint trailingZeros = (unsigned)__builtin_ctz(x);
     if (x % 2 == 0) {
-        return x >> 1;
+        shiftcounter = trailingZeros;
+        return x >> trailingZeros;
     }
-    return (x << 1) + x + 1;
+    shiftcounter = 1;
+    return ((x << 1) | 1) + x;
 }
