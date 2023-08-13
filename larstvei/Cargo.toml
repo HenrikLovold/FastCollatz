@@ -1,0 +1,21 @@
+[package]
+name = "collatz"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rayon = "1.7.0"
+
+[[bin]]
+name = "recursive"
+path = "src/recursive.rs"
+
+[[bin]]
+name = "iterative"
+path = "src/iterative.rs"
+
+[[bin]]
+name = "parallel"
+path = "src/parallel.rs"
