@@ -4,8 +4,8 @@
 #include <thread>
 #include <vector>
 
-#define VERBOSE
-#undef VERBOSE
+#define THREAD_VERBOSE
+#undef THREAD_VERBOSE
 
 /*
 Some words on race conditions:
@@ -83,14 +83,14 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void collatzThread(int64_t from, int64_t to, unsigned int threadID) {
-    #ifdef VERBOSE
+void collatzThread(int64_t from, int64_t to, uint threadID) {
+    #ifdef THREAD_VERBOSE
     std::cout << "Thread #" << threadID << " started" << std::endl;
     #endif
     for (int64_t i = from; i <= to; i++) {
         collatz(i);
     }
-    #ifdef VERBOSE
+    #ifdef THREAD_VERBOSE
     std::cout << "Thread #" << threadID << " finished" << std::endl;
     #endif
 }
@@ -112,8 +112,9 @@ int64_t collatz(int64_t x) {
     return pathLen;
 }
 
+#ifndef _WIN64
 int64_t collatzNext(int64_t x, int& shiftcounter) {
-    unsigned int trailingZeros = (unsigned)__builtin_ctz(x);
+    uint8_t trailingZeros = (unsigned)__builtin_ctz(x);
     if (x % 2 == 0) {
         shiftcounter = trailingZeros;
         return x >> trailingZeros;
@@ -121,3 +122,16 @@ int64_t collatzNext(int64_t x, int& shiftcounter) {
     shiftcounter = 1;
     return ((x << 1) | 1) + x;
 }
+#endif
+
+#ifdef _WIN64
+int64_t collatzNext(int64_t x, int& shiftcounter) {
+    uint64_t trailingZeros = (unsigned)__lzcnt64(x);
+    if (x % 2 == 0) {
+        shiftcounter = trailingZeros;
+        return x >> trailingZeros;
+    }
+    shiftcounter = 1;
+    return ((x << 1) | 1) + x;
+}
+#endif
