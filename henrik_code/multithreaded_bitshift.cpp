@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void collatzThread(int64_t from, int64_t to, uint threadID) {
+void collatzThread(int64_t from, int64_t to, unsigned int threadID) {
     #ifdef THREAD_VERBOSE
     std::cout << "Thread #" << threadID << " started" << std::endl;
     #endif
@@ -114,7 +114,7 @@ int64_t collatz(int64_t x) {
 
 #ifndef _WIN64
 int64_t collatzNext(int64_t x, int& shiftcounter) {
-    uint8_t trailingZeros = (unsigned)__builtin_ctz(x);
+    unsigned int8_t trailingZeros = (unsigned)__builtin_ctz(x);
     if (x % 2 == 0) {
         shiftcounter = trailingZeros;
         return x >> trailingZeros;
