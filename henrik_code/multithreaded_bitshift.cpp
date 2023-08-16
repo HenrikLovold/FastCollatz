@@ -114,7 +114,7 @@ int64_t collatz(int64_t x) {
 
 #ifndef _WIN64
 int64_t collatzNext(int64_t x, int& shiftcounter) {
-    unsigned int8_t trailingZeros = (unsigned)__builtin_ctz(x);
+    uint8_t trailingZeros = (unsigned)__builtin_ctz(x);
     if (x % 2 == 0) {
         shiftcounter = trailingZeros;
         return x >> trailingZeros;
