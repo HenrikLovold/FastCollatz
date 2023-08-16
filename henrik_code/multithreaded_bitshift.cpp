@@ -23,13 +23,13 @@ threads available on the CPU. You should also experiment with multiples of
 number of cores. Have fun!
 */
 
-void collatzThread(int64_t from, int64_t to, uint threadID);
+void collatzThread(int64_t from, int64_t to, unsigned int threadID);
 int64_t collatzNext(int64_t x);
 int64_t collatz(int64_t x);
 
 int64_t *memo;
 int64_t N;
-uint nThreads;
+unsigned int nThreads;
 
 int main(int argc, char **argv) {
     // argv check
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void collatzThread(int64_t from, int64_t to, uint threadID) {
+void collatzThread(int64_t from, int64_t to, unsigned int threadID) {
     #ifdef VERBOSE
     std::cout << "Thread #" << threadID << " started" << std::endl;
     #endif
