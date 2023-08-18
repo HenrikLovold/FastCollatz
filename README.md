@@ -29,6 +29,6 @@ collatz(x):
 #### Rules
 
 - Calculate all Collatz paths for 2 to N
-- Programs should take ONE argv parameter N
+- Your program's first argument must be N
 
 For testing purposes, run $N=1*10^7$, as this is what we're benchmarking.
