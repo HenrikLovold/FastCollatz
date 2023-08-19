@@ -35,6 +35,7 @@ uint16_t nThreads;
 bool recursive = false;
 void (*thrFunc)(int64_t, int64_t, uint16_t) = &collatzThread;
 
+
 int main(int argc, char **argv) {
     // argv check
     if (argc < 2) {
