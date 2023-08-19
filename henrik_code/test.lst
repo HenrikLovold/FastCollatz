@@ -1,0 +1,2480 @@
+   1              		.file	"multithreaded_bitshift.cpp"
+   2              	# GNU C++17 (Ubuntu 9.4.0-1ubuntu1~20.04.1) version 9.4.0 (x86_64-linux-gnu)
+   3              	#	compiled by GNU C version 9.4.0, GMP version 6.2.0, MPFR version 4.0.2, MPC version 1.1.0, isl ve
+   4              	
+   5              	# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+   6              	# options passed:  -imultiarch x86_64-linux-gnu -D_GNU_SOURCE -D_REENTRANT
+   7              	# multithreaded_bitshift.cpp -mtune=generic -march=x86-64
+   8              	# -auxbase-strip main.s -O3 -std=c++2a -fverbose-asm
+   9              	# -fasynchronous-unwind-tables -fstack-protector-strong -Wformat
+  10              	# -Wformat-security -fstack-clash-protection -fcf-protection
+  11              	# options enabled:  -fPIC -fPIE -faggressive-loop-optimizations
+  12              	# -falign-functions -falign-jumps -falign-labels -falign-loops
+  13              	# -fassume-phsa -fasynchronous-unwind-tables -fauto-inc-dec
+  14              	# -fbranch-count-reg -fcaller-saves -fcode-hoisting
+  15              	# -fcombine-stack-adjustments -fcommon -fcompare-elim -fcprop-registers
+  16              	# -fcrossjumping -fcse-follow-jumps -fdefer-pop
+  17              	# -fdelete-null-pointer-checks -fdevirtualize -fdevirtualize-speculatively
+  18              	# -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+  19              	# -fexceptions -fexpensive-optimizations -fforward-propagate
+  20              	# -ffp-int-builtin-inexact -ffunction-cse -fgcse -fgcse-after-reload
+  21              	# -fgcse-lm -fgnu-runtime -fgnu-unique -fguess-branch-probability
+  22              	# -fhoist-adjacent-loads -fident -fif-conversion -fif-conversion2
+  23              	# -findirect-inlining -finline -finline-atomics -finline-functions
+  24              	# -finline-functions-called-once -finline-small-functions -fipa-bit-cp
+  25              	# -fipa-cp -fipa-cp-clone -fipa-icf -fipa-icf-functions -fipa-icf-variables
+  26              	# -fipa-profile -fipa-pure-const -fipa-ra -fipa-reference
+  27              	# -fipa-reference-addressable -fipa-sra -fipa-stack-alignment -fipa-vrp
+  28              	# -fira-hoist-pressure -fira-share-save-slots -fira-share-spill-slots
+  29              	# -fisolate-erroneous-paths-dereference -fivopts -fkeep-static-consts
+  30              	# -fleading-underscore -flifetime-dse -floop-interchange
+  31              	# -floop-unroll-and-jam -flra-remat -flto-odr-type-merging -fmath-errno
+  32              	# -fmerge-constants -fmerge-debug-strings -fmove-loop-invariants
+  33              	# -fomit-frame-pointer -foptimize-sibling-calls -foptimize-strlen
+  34              	# -fpartial-inlining -fpeel-loops -fpeephole -fpeephole2 -fplt
+  35              	# -fpredictive-commoning -fprefetch-loop-arrays -free -freg-struct-return
+  36              	# -freorder-blocks -freorder-blocks-and-partition -freorder-functions
+  37              	# -frerun-cse-after-loop -fsched-critical-path-heuristic
+  38              	# -fsched-dep-count-heuristic -fsched-group-heuristic -fsched-interblock
+  39              	# -fsched-last-insn-heuristic -fsched-rank-heuristic -fsched-spec
+  40              	# -fsched-spec-insn-heuristic -fsched-stalled-insns-dep -fschedule-fusion
+  41              	# -fschedule-insns2 -fsemantic-interposition -fshow-column -fshrink-wrap
+  42              	# -fshrink-wrap-separate -fsigned-zeros -fsplit-ivs-in-unroller
+  43              	# -fsplit-loops -fsplit-paths -fsplit-wide-types -fssa-backprop
+  44              	# -fssa-phiopt -fstack-clash-protection -fstack-protector-strong
+  45              	# -fstdarg-opt -fstore-merging -fstrict-aliasing
+  46              	# -fstrict-volatile-bitfields -fsync-libcalls -fthread-jumps
+  47              	# -ftoplevel-reorder -ftrapping-math -ftree-bit-ccp -ftree-builtin-call-dce
+  48              	# -ftree-ccp -ftree-ch -ftree-coalesce-vars -ftree-copy-prop -ftree-cselim
+  49              	# -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-forwprop -ftree-fre
+  50              	# -ftree-loop-distribute-patterns -ftree-loop-distribution
+  51              	# -ftree-loop-if-convert -ftree-loop-im -ftree-loop-ivcanon
+  52              	# -ftree-loop-optimize -ftree-loop-vectorize -ftree-parallelize-loops=
+  53              	# -ftree-partial-pre -ftree-phiprop -ftree-pre -ftree-pta -ftree-reassoc
+  54              	# -ftree-scev-cprop -ftree-sink -ftree-slp-vectorize -ftree-slsr -ftree-sra
+  55              	# -ftree-switch-conversion -ftree-tail-merge -ftree-ter -ftree-vrp
+  56              	# -funit-at-a-time -funswitch-loops -funwind-tables -fverbose-asm
+  57              	# -fversion-loops-for-strides -fzero-initialized-in-bss
+  58              	# -m128bit-long-double -m64 -m80387 -malign-stringops
+  59              	# -mavx256-split-unaligned-load -mavx256-split-unaligned-store
+  60              	# -mfancy-math-387 -mfp-ret-in-387 -mfxsr -mglibc -mieee-fp
+  61              	# -mlong-double-80 -mmmx -mno-sse4 -mpush-args -mred-zone -msse -msse2
+  62              	# -mstv -mtls-direct-seg-refs -mvzeroupper
+  63              	
+  64              		.text
+  65              		.section	.text._ZNKSt5ctypeIcE8do_widenEc,"axG",@progbits,_ZNKSt5ctypeIcE8do_widenEc,comdat
+  66              		.align 2
+  67              		.p2align 4
+  68              		.weak	_ZNKSt5ctypeIcE8do_widenEc
+  70              	_ZNKSt5ctypeIcE8do_widenEc:
+  71              	.LFB1974:
+  72              		.cfi_startproc
+  73 0000 F30F1EFA 		endbr64	
+  74              	# /usr/include/c++/9/bits/locale_facets.h:1084:       do_widen(char __c) const
+  75 0004 89F0     		movl	%esi, %eax	# tmp87, __c
+  76              	# /usr/include/c++/9/bits/locale_facets.h:1085:       { return __c; }
+  77 0006 C3       		ret	
+  78              		.cfi_endproc
+  79              	.LFE1974:
+  81              		.section	.text._ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEE6_M_runEv,"axG",@pr
+  82              		.align 2
+  83              		.p2align 4
+  84              		.weak	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEE6_M_runEv
+  86              	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEE6_M_runEv:
+  87              	.LFB4472:
+  88              		.cfi_startproc
+  89 0000 F30F1EFA 		endbr64	
+  90              	# /usr/include/c++/9/bits/invoke.h:60:     { return std::forward<_Fn>(__f)(std::forward<_Args>(__ar
+  91 0004 4C8B4718 		movq	24(%rdi), %r8	# MEM[(long unsigned int &)this_1(D) + 24], MEM[(long unsigned int &)this_1(D) 
+  92 0008 0FB75708 		movzwl	8(%rdi), %edx	# MEM[(short unsigned int &)this_1(D) + 8], MEM[(short unsigned int &)this_1(
+  93 000c 488B7710 		movq	16(%rdi), %rsi	# MEM[(long unsigned int &)this_1(D) + 16], MEM[(long unsigned int &)this_1(D)
+  94 0010 488B4720 		movq	32(%rdi), %rax	# MEM[(void (*<Tc08d>) (long int, long int, short unsigned int) &)this_1(D) + 
+  95 0014 4C89C7   		movq	%r8, %rdi	# MEM[(long unsigned int &)this_1(D) + 24],
+  96 0017 FFE0     		jmp	*%rax	# MEM[(void (*<Tc08d>) (long int, long int, short unsigned int) &)this_1(D) + 32]
+  97              		.cfi_endproc
+  98              	.LFE4472:
+ 100              		.section	.text._ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED2Ev,"axG",@progbit
+ 101              		.align 2
+ 102              		.p2align 4
+ 103              		.weak	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED2Ev
+ 105              	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED2Ev:
+ 106              	.LFB4452:
+ 107              		.cfi_startproc
+ 108 0000 F30F1EFA 		endbr64	
+ 109              	# /usr/include/c++/9/thread:187:       struct _State_impl : public _State
+ 110 0004 488D0500 		leaq	16+_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE(%rip), %rax	#, tmp86
+ 110      000000
+ 111 000b 488907   		movq	%rax, (%rdi)	# tmp86, this_3(D)->D.82060._vptr._State
+ 112 000e E9000000 		jmp	_ZNSt6thread6_StateD2Ev@PLT	#
+ 112      00
+ 113              		.cfi_endproc
+ 114              	.LFE4452:
+ 116              		.weak	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED1Ev
+ 117              		.set	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED1Ev,_ZNSt6thread11_State_imp
+ 118              		.section	.text._ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED0Ev,"axG",@progbit
+ 119              		.align 2
+ 120              		.p2align 4
+ 121              		.weak	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED0Ev
+ 123              	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED0Ev:
+ 124              	.LFB4454:
+ 125              		.cfi_startproc
+ 126 0000 F30F1EFA 		endbr64	
+ 127 0004 488D0500 		leaq	16+_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE(%rip), %rax	#, tmp86
+ 127      000000
+ 128 000b 55       		pushq	%rbp	#
+ 129              		.cfi_def_cfa_offset 16
+ 130              		.cfi_offset 6, -16
+ 131              	# /usr/include/c++/9/thread:187:       struct _State_impl : public _State
+ 132 000c 4889FD   		movq	%rdi, %rbp	# tmp85, this
+ 133 000f 488907   		movq	%rax, (%rdi)	# tmp86, this_2(D)->D.82060._vptr._State
+ 134 0012 E8000000 		call	_ZNSt6thread6_StateD2Ev@PLT	#
+ 134      00
+ 135 0017 4889EF   		movq	%rbp, %rdi	# this,
+ 136 001a BE280000 		movl	$40, %esi	#,
+ 136      00
+ 137 001f 5D       		popq	%rbp	#
+ 138              		.cfi_def_cfa_offset 8
+ 139 0020 E9000000 		jmp	_ZdlPvm@PLT	#
+ 139      00
+ 140              		.cfi_endproc
+ 141              	.LFE4454:
+ 143              		.text
+ 144              		.p2align 4
+ 145              		.globl	_Z7collatzl
+ 147              	_Z7collatzl:
+ 148              	.LFB3618:
+ 149              		.cfi_startproc
+ 150 0000 F30F1EFA 		endbr64	
+ 151              	# multithreaded_bitshift.cpp:143:     if (x % 2 == 0) {
+ 152 0004 40F6C701 		testb	$1, %dil	#, x.55_34
+ 153 0008 7476     		je	.L28	#,
+ 154              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 155 000a 488D443F 		leaq	1(%rdi,%rdi), %rax	#, tmp111
+ 155      01
+ 156              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 157 000f 41B80100 		movl	$1, %r8d	#, <retval>
+ 157      0000
+ 158 0015 4801F8   		addq	%rdi, %rax	# x.55_34, nextX
+ 159              	.L9:
+ 160 0018 4C8B0D00 		movq	memo(%rip), %r9	# memo, pretmp_65
+ 160      000000
+ 161              	# multithreaded_bitshift.cpp:129:     while (nextX != 1) {
+ 162 001f 4883F801 		cmpq	$1, %rax	#, nextX
+ 163 0023 7432     		je	.L10	#,
+ 164              	# multithreaded_bitshift.cpp:130:         if (nextX < N && memo[nextX] != 0) {
+ 165 0025 488B3500 		movq	N(%rip), %rsi	# N, N.43_3
+ 165      000000
+ 166 002c 0F1F4000 		.p2align 4,,10
+ 167              		.p2align 3
+ 168              	.L15:
+ 169              	# multithreaded_bitshift.cpp:130:         if (nextX < N && memo[nextX] != 0) {
+ 170 0030 4839C6   		cmpq	%rax, %rsi	# nextX, N.43_3
+ 171 0033 7E0C     		jle	.L11	#,
+ 172              	# multithreaded_bitshift.cpp:130:         if (nextX < N && memo[nextX] != 0) {
+ 173 0035 498D0CC1 		leaq	(%r9,%rax,8), %rcx	#, _7
+ 174 0039 488B11   		movq	(%rcx), %rdx	# *_7, _8
+ 175              	# multithreaded_bitshift.cpp:130:         if (nextX < N && memo[nextX] != 0) {
+ 176 003c 4885D2   		testq	%rdx, %rdx	# _8
+ 177 003f 7557     		jne	.L29	#,
+ 178              	.L11:
+ 179              	# multithreaded_bitshift.cpp:143:     if (x % 2 == 0) {
+ 180 0041 A801     		testb	$1, %al	#, nextX
+ 181 0043 741B     		je	.L30	#,
+ 182              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 183 0045 488D5400 		leaq	1(%rax,%rax), %rdx	#, tmp120
+ 183      01
+ 184              	# multithreaded_bitshift.cpp:135:         pathLen += shiftcounter;
+ 185 004a 4983C001 		addq	$1, %r8	#, <retval>
+ 186              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 187 004e 4801D0   		addq	%rdx, %rax	# tmp120, nextX
+ 188              	# multithreaded_bitshift.cpp:129:     while (nextX != 1) {
+ 189 0051 4883F801 		cmpq	$1, %rax	#, nextX
+ 190 0055 75D9     		jne	.L15	#,
+ 191              	.L10:
+ 192              	# multithreaded_bitshift.cpp:137:     memo[x] = pathLen;
+ 193 0057 4D8904F9 		movq	%r8, (%r9,%rdi,8)	# <retval>, *_18
+ 194              	# multithreaded_bitshift.cpp:139: }
+ 195 005b 4C89C0   		movq	%r8, %rax	# <retval>,
+ 196 005e C3       		ret	
+ 197 005f 90       		.p2align 4,,10
+ 198              		.p2align 3
+ 199              	.L30:
+ 200              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 201 0060 31C9     		xorl	%ecx, %ecx	# _42
+ 202 0062 F30FBCC8 		rep bsfl	%eax, %ecx	# nextX, _42
+ 203              	# multithreaded_bitshift.cpp:145:         return x >> trailingZeros;
+ 204 0066 48D3F8   		sarq	%cl, %rax	# _42, nextX
+ 205              	# multithreaded_bitshift.cpp:135:         pathLen += shiftcounter;
+ 206 0069 4863C9   		movslq	%ecx, %rcx	# _42, _42
+ 207 006c 4901C8   		addq	%rcx, %r8	# _42, <retval>
+ 208              	# multithreaded_bitshift.cpp:129:     while (nextX != 1) {
+ 209 006f 4883F801 		cmpq	$1, %rax	#, nextX
+ 210 0073 75BB     		jne	.L15	#,
+ 211 0075 EBE0     		jmp	.L10	#
+ 212 0077 660F1F84 		.p2align 4,,10
+ 212      00000000 
+ 212      00
+ 213              		.p2align 3
+ 214              	.L28:
+ 215              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 216 0080 31C9     		xorl	%ecx, %ecx	# _32
+ 217              	# multithreaded_bitshift.cpp:145:         return x >> trailingZeros;
+ 218 0082 4889F8   		movq	%rdi, %rax	# x.55_34, nextX
+ 219              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 220 0085 F30FBCCF 		rep bsfl	%edi, %ecx	# x.55_34, _32
+ 221              	# multithreaded_bitshift.cpp:145:         return x >> trailingZeros;
+ 222 0089 48D3F8   		sarq	%cl, %rax	# _32, nextX
+ 223 008c 4C63C1   		movslq	%ecx, %r8	# _32, <retval>
+ 224 008f EB87     		jmp	.L9	#
+ 225              		.p2align 4,,10
+ 226 0091 0F1F8000 		.p2align 3
+ 226      000000
+ 227              	.L29:
+ 228              	# multithreaded_bitshift.cpp:131:             memo[x] = pathLen + memo[nextX];
+ 229 0098 4C01C2   		addq	%r8, %rdx	# <retval>, tmp113
+ 230 009b 498914F9 		movq	%rdx, (%r9,%rdi,8)	# tmp113, *_12
+ 231              	# multithreaded_bitshift.cpp:132:             return pathLen + memo[nextX];
+ 232 009f 4C0301   		addq	(%rcx), %r8	# *_7, <retval>
+ 233              	# multithreaded_bitshift.cpp:139: }
+ 234 00a2 4C89C0   		movq	%r8, %rax	# <retval>,
+ 235 00a5 C3       		ret	
+ 236              		.cfi_endproc
+ 237              	.LFE3618:
+ 239 00a6 662E0F1F 		.p2align 4
+ 239      84000000 
+ 239      0000
+ 240              		.globl	_Z13collatzThreadllt
+ 242              	_Z13collatzThreadllt:
+ 243              	.LFB3616:
+ 244              		.cfi_startproc
+ 245 00b0 F30F1EFA 		endbr64	
+ 246              	# multithreaded_bitshift.cpp:113:     for (int64_t i = from; i <= to; i++) {
+ 247 00b4 4839F7   		cmpq	%rsi, %rdi	# to, from
+ 248 00b7 7F15     		jg	.L31	#,
+ 249 00b9 4C8D5601 		leaq	1(%rsi), %r10	#, _9
+ 250 00bd 0F1F00   		.p2align 4,,10
+ 251              		.p2align 3
+ 252              	.L33:
+ 253              	# multithreaded_bitshift.cpp:114:         collatz(i);
+ 254 00c0 E8000000 		call	_Z7collatzl	#
+ 254      00
+ 255              	# multithreaded_bitshift.cpp:113:     for (int64_t i = from; i <= to; i++) {
+ 256 00c5 4883C701 		addq	$1, %rdi	#, from
+ 257              	# multithreaded_bitshift.cpp:113:     for (int64_t i = from; i <= to; i++) {
+ 258 00c9 4C39D7   		cmpq	%r10, %rdi	# _9, from
+ 259 00cc 75F2     		jne	.L33	#,
+ 260              	.L31:
+ 261              	# multithreaded_bitshift.cpp:116: }
+ 262 00ce C3       		ret	
+ 263              		.cfi_endproc
+ 264              	.LFE3616:
+ 266 00cf 90       		.p2align 4
+ 267              		.globl	_Z11collatzNextlRh
+ 269              	_Z11collatzNextlRh:
+ 270              	.LFB3619:
+ 271              		.cfi_startproc
+ 272 00d0 F30F1EFA 		endbr64	
+ 273              	# multithreaded_bitshift.cpp:143:     if (x % 2 == 0) {
+ 274 00d4 40F6C701 		testb	$1, %dil	#, x
+ 275 00d8 7416     		je	.L38	#,
+ 276              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 277 00da 488D443F 		leaq	1(%rdi,%rdi), %rax	#, tmp94
+ 277      01
+ 278              	# multithreaded_bitshift.cpp:147:     shiftcounter = 1;
+ 279 00df BA010000 		movl	$1, %edx	#, _16
+ 279      00
+ 280 00e4 8816     		movb	%dl, (%rsi)	# _16, *shiftcounter_10(D)
+ 281              	# multithreaded_bitshift.cpp:148:     return ((x << 1) | 1) + x;
+ 282 00e6 4801F8   		addq	%rdi, %rax	# x, <retval>
+ 283              	# multithreaded_bitshift.cpp:149: }
+ 284 00e9 C3       		ret	
+ 285 00ea 660F1F44 		.p2align 4,,10
+ 285      0000
+ 286              		.p2align 3
+ 287              	.L38:
+ 288              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 289 00f0 31C9     		xorl	%ecx, %ecx	# _15
+ 290              	# multithreaded_bitshift.cpp:145:         return x >> trailingZeros;
+ 291 00f2 4889F8   		movq	%rdi, %rax	# x, x
+ 292              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 293 00f5 F30FBCCF 		rep bsfl	%edi, %ecx	# x, _15
+ 294              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 295 00f9 89CA     		movl	%ecx, %edx	# _15, _16
+ 296              	# multithreaded_bitshift.cpp:145:         return x >> trailingZeros;
+ 297 00fb 48D3F8   		sarq	%cl, %rax	# _15, x
+ 298 00fe 8816     		movb	%dl, (%rsi)	# _16, *shiftcounter_10(D)
+ 299              	# multithreaded_bitshift.cpp:149: }
+ 300 0100 C3       		ret	
+ 301              		.cfi_endproc
+ 302              	.LFE3619:
+ 304 0101 66662E0F 		.p2align 4
+ 304      1F840000 
+ 304      0000000F 
+ 304      1F4000
+ 305              		.globl	_Z10collatzRecl
+ 307              	_Z10collatzRecl:
+ 308              	.LFB3620:
+ 309              		.cfi_startproc
+ 310 0110 F30F1EFA 		endbr64	
+ 311              	# multithreaded_bitshift.cpp:153:         return 0;
+ 312 0114 31C0     		xorl	%eax, %eax	# <retval>
+ 313              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 314 0116 4883FF01 		cmpq	$1, %rdi	#, x
+ 315 011a 7474     		je	.L47	#,
+ 316              	# multithreaded_bitshift.cpp:151: int64_t collatzRec(int64_t x) {
+ 317 011c 55       		pushq	%rbp	#
+ 318              		.cfi_def_cfa_offset 16
+ 319              		.cfi_offset 6, -16
+ 320 011d 53       		pushq	%rbx	#
+ 321              		.cfi_def_cfa_offset 24
+ 322              		.cfi_offset 3, -24
+ 323 011e 4889FB   		movq	%rdi, %rbx	# tmp112, x
+ 324 0121 4883EC08 		subq	$8, %rsp	#,
+ 325              		.cfi_def_cfa_offset 32
+ 326              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 327 0125 48393D00 		cmpq	%rdi, N(%rip)	# x, N
+ 327      000000
+ 328 012c 7E10     		jle	.L41	#,
+ 329              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 330 012e 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 330      000000
+ 331 0135 488B04F8 		movq	(%rax,%rdi,8), %rax	# *_5, <retval>
+ 332              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 333 0139 4885C0   		testq	%rax, %rax	# <retval>
+ 334 013c 752A     		jne	.L39	#,
+ 335              	.L41:
+ 336              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 337 013e F6C301   		testb	$1, %bl	#, x
+ 338 0141 742D     		je	.L50	#,
+ 339              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 340 0143 488D7C1B 		leaq	1(%rbx,%rbx), %rdi	#, tmp108
+ 340      01
+ 341              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 342 0148 4801DF   		addq	%rbx, %rdi	# x, tmp109
+ 343 014b E8000000 		call	_Z10collatzRecl	#
+ 343      00
+ 344              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 345 0150 4883C001 		addq	$1, %rax	#, <retval>
+ 346              	.L43:
+ 347              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 348 0154 483B1D00 		cmpq	N(%rip), %rbx	# N, x
+ 348      000000
+ 349 015b 7D0B     		jge	.L39	#,
+ 350              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 351 015d 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 351      000000
+ 352 0164 488904DA 		movq	%rax, (%rdx,%rbx,8)	# <retval>, *_29
+ 353              	.L39:
+ 354              	# multithreaded_bitshift.cpp:170: }
+ 355 0168 4883C408 		addq	$8, %rsp	#,
+ 356              		.cfi_remember_state
+ 357              		.cfi_def_cfa_offset 24
+ 358 016c 5B       		popq	%rbx	#
+ 359              		.cfi_def_cfa_offset 16
+ 360 016d 5D       		popq	%rbp	#
+ 361              		.cfi_def_cfa_offset 8
+ 362 016e C3       		ret	
+ 363 016f 90       		.p2align 4,,10
+ 364              		.p2align 3
+ 365              	.L50:
+ 366              		.cfi_restore_state
+ 367              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 368 0170 31ED     		xorl	%ebp, %ebp	# _16
+ 369              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 370 0172 4889DF   		movq	%rbx, %rdi	# x, tmp105
+ 371              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 372 0175 F30FBCEB 		rep bsfl	%ebx, %ebp	# x, _16
+ 373              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 374 0179 89E9     		movl	%ebp, %ecx	# _16, tmp116
+ 375 017b 48D3FF   		sarq	%cl, %rdi	# tmp116, tmp105
+ 376 017e E8000000 		call	_Z10collatzRecl	#
+ 376      00
+ 377 0183 4989C0   		movq	%rax, %r8	#, tmp113
+ 378              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 379 0186 4863C5   		movslq	%ebp, %rax	# _16, _16
+ 380              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 381 0189 4C01C0   		addq	%r8, %rax	# tmp113, <retval>
+ 382 018c EBC6     		jmp	.L43	#
+ 383 018e 6690     		.p2align 4,,10
+ 384              		.p2align 3
+ 385              	.L47:
+ 386              		.cfi_def_cfa_offset 8
+ 387              		.cfi_restore 3
+ 388              		.cfi_restore 6
+ 389              	# multithreaded_bitshift.cpp:170: }
+ 390 0190 C3       		ret	
+ 391              		.cfi_endproc
+ 392              	.LFE3620:
+ 394 0191 66662E0F 		.p2align 4
+ 394      1F840000 
+ 394      0000000F 
+ 394      1F4000
+ 395              		.globl	_Z16collatzThreadRecllt
+ 397              	_Z16collatzThreadRecllt:
+ 398              	.LFB3617:
+ 399              		.cfi_startproc
+ 400 01a0 F30F1EFA 		endbr64	
+ 401              	# multithreaded_bitshift.cpp:119:     for (int64_t i = from; i <= to; i++) {
+ 402 01a4 4839F7   		cmpq	%rsi, %rdi	# to, from
+ 403 01a7 0F8FC303 		jg	.L107	#,
+ 403      0000
+ 404              	# multithreaded_bitshift.cpp:118: void collatzThreadRec(int64_t from, int64_t to, uint16_t threadID
+ 405 01ad 4154     		pushq	%r12	#
+ 406              		.cfi_def_cfa_offset 16
+ 407              		.cfi_offset 12, -16
+ 408 01af 4989F9   		movq	%rdi, %r9	# tmp266, from
+ 409 01b2 55       		pushq	%rbp	#
+ 410              		.cfi_def_cfa_offset 24
+ 411              		.cfi_offset 6, -24
+ 412 01b3 53       		pushq	%rbx	#
+ 413              		.cfi_def_cfa_offset 32
+ 414              		.cfi_offset 3, -32
+ 415 01b4 488D5E01 		leaq	1(%rsi), %rbx	#, _96
+ 416 01b8 0F1F8400 		.p2align 4,,10
+ 416      00000000 
+ 417              		.p2align 3
+ 418              	.L84:
+ 419              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 420 01c0 4983F901 		cmpq	$1, %r9	#, from
+ 421 01c4 0F840001 		je	.L54	#,
+ 421      0000
+ 422              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 423 01ca 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 423      000000
+ 424              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 425 01d1 4C39C8   		cmpq	%r9, %rax	# from, prephitmp_333
+ 426 01d4 7E12     		jle	.L55	#,
+ 427              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 428 01d6 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 428      000000
+ 429              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 430 01dd 4A833CCA 		cmpq	$0, (%rdx,%r9,8)	#, *_12
+ 430      00
+ 431 01e2 0F85E200 		jne	.L54	#,
+ 431      0000
+ 432              	.L55:
+ 433              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 434 01e8 41F6C101 		testb	$1, %r9b	#, from
+ 435 01ec 0F85EE00 		jne	.L57	#,
+ 435      0000
+ 436              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 437 01f2 31F6     		xorl	%esi, %esi	# _19
+ 438              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 439 01f4 4D89CA   		movq	%r9, %r10	# from, _20
+ 440              	# multithreaded_bitshift.cpp:153:         return 0;
+ 441 01f7 31D2     		xorl	%edx, %edx	# currPathLen
+ 442              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 443 01f9 F3410FBC 		rep bsfl	%r9d, %esi	# from, _19
+ 443      F1
+ 444              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 445 01fe 89F1     		movl	%esi, %ecx	# _19, tmp277
+ 446 0200 49D3FA   		sarq	%cl, %r10	# tmp277, _20
+ 447              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 448 0203 4983FA01 		cmpq	$1, %r10	#, _20
+ 449 0207 0F84A700 		je	.L58	#,
+ 449      0000
+ 450              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 451 020d 4C39D0   		cmpq	%r10, %rax	# _20, prephitmp_333
+ 452 0210 7E14     		jle	.L59	#,
+ 453              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 454 0212 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 454      000000
+ 455 0219 4A8B14D2 		movq	(%rdx,%r10,8), %rdx	# *_39, currPathLen
+ 456              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 457 021d 4885D2   		testq	%rdx, %rdx	# currPathLen
+ 458 0220 0F858E00 		jne	.L58	#,
+ 458      0000
+ 459              	.L59:
+ 460              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 461 0226 41F6C201 		testb	$1, %r10b	#, _20
+ 462 022a 0F858001 		jne	.L60	#,
+ 462      0000
+ 463              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 464 0230 4531DB   		xorl	%r11d, %r11d	# _46
+ 465              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 466 0233 4C89D5   		movq	%r10, %rbp	# _20, _47
+ 467              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 468 0236 F3450FBC 		rep bsfl	%r10d, %r11d	# _20, _46
+ 468      DA
+ 469              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 470 023b 4489D9   		movl	%r11d, %ecx	# _46, tmp279
+ 471 023e 48D3FD   		sarq	%cl, %rbp	# tmp279, _47
+ 472              	# multithreaded_bitshift.cpp:153:         return 0;
+ 473 0241 31C9     		xorl	%ecx, %ecx	# currPathLen
+ 474              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 475 0243 4883FD01 		cmpq	$1, %rbp	#, _47
+ 476 0247 744E     		je	.L61	#,
+ 477              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 478 0249 4839E8   		cmpq	%rbp, %rax	# _47, prephitmp_333
+ 479 024c 7E10     		jle	.L62	#,
+ 480              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 481 024e 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 481      000000
+ 482 0255 488B0CEA 		movq	(%rdx,%rbp,8), %rcx	# *_66, currPathLen
+ 483              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 484 0259 4885C9   		testq	%rcx, %rcx	# currPathLen
+ 485 025c 7539     		jne	.L61	#,
+ 486              	.L62:
+ 487              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 488 025e 40F6C501 		testb	$1, %bpl	#, _47
+ 489 0262 0F84A802 		je	.L110	#,
+ 489      0000
+ 490              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 491 0268 488D7C2D 		leaq	1(%rbp,%rbp), %rdi	#, tmp224
+ 491      01
+ 492              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 493 026d 4801EF   		addq	%rbp, %rdi	# _47, tmp225
+ 494 0270 E8000000 		call	_Z10collatzRecl	#
+ 494      00
+ 495              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 496 0275 488D4801 		leaq	1(%rax), %rcx	#, currPathLen
+ 497              	.L64:
+ 498              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 499 0279 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 499      000000
+ 500              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 501 0280 4839C5   		cmpq	%rax, %rbp	# prephitmp_333, _47
+ 502 0283 7D12     		jge	.L61	#,
+ 503              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 504 0285 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 504      000000
+ 505 028c 48890CE8 		movq	%rcx, (%rax,%rbp,8)	# currPathLen, *_86
+ 506 0290 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 506      000000
+ 507              	.L61:
+ 508              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 509 0297 4963D3   		movslq	%r11d, %rdx	# _46, _46
+ 510              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 511 029a 4801CA   		addq	%rcx, %rdx	# currPathLen, currPathLen
+ 512              	.L65:
+ 513              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 514 029d 4939C2   		cmpq	%rax, %r10	# prephitmp_333, _20
+ 515 02a0 7D12     		jge	.L58	#,
+ 516              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 517 02a2 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 517      000000
+ 518 02a9 4A8914D0 		movq	%rdx, (%rax,%r10,8)	# currPathLen, *_59
+ 519 02ad 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 519      000000
+ 520              	.L58:
+ 521              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 522 02b4 4863CE   		movslq	%esi, %rcx	# _19, _19
+ 523              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 524 02b7 4801D1   		addq	%rdx, %rcx	# currPathLen, currPathLen
+ 525              	.L70:
+ 526              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 527 02ba 4939C1   		cmpq	%rax, %r9	# prephitmp_333, from
+ 528 02bd 7D0B     		jge	.L54	#,
+ 529              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 530 02bf 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 530      000000
+ 531 02c6 4A890CC8 		movq	%rcx, (%rax,%r9,8)	# currPathLen, *_32
+ 532              	.L54:
+ 533              	# multithreaded_bitshift.cpp:119:     for (int64_t i = from; i <= to; i++) {
+ 534 02ca 4983C101 		addq	$1, %r9	#, from
+ 535              	# multithreaded_bitshift.cpp:119:     for (int64_t i = from; i <= to; i++) {
+ 536 02ce 4939D9   		cmpq	%rbx, %r9	# _96, from
+ 537 02d1 0F85E9FE 		jne	.L84	#,
+ 537      FFFF
+ 538              	# multithreaded_bitshift.cpp:122: }
+ 539 02d7 5B       		popq	%rbx	#
+ 540              		.cfi_remember_state
+ 541              		.cfi_def_cfa_offset 24
+ 542 02d8 5D       		popq	%rbp	#
+ 543              		.cfi_def_cfa_offset 16
+ 544 02d9 415C     		popq	%r12	#
+ 545              		.cfi_def_cfa_offset 8
+ 546 02db C3       		ret	
+ 547 02dc 0F1F4000 		.p2align 4,,10
+ 548              		.p2align 3
+ 549              	.L57:
+ 550              		.cfi_restore_state
+ 551              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 552 02e0 4B8D7409 		leaq	1(%r9,%r9), %rsi	#, tmp241
+ 552      01
+ 553 02e5 B9010000 		movl	$1, %ecx	#, currPathLen
+ 553      00
+ 554              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 555 02ea 4C01CE   		addq	%r9, %rsi	# from, _26
+ 556              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 557 02ed 4883FE01 		cmpq	$1, %rsi	#, _26
+ 558 02f1 74C7     		je	.L70	#,
+ 559              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 560 02f3 4839F0   		cmpq	%rsi, %rax	# _26, prephitmp_333
+ 561 02f6 7E14     		jle	.L72	#,
+ 562              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 563 02f8 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 563      000000
+ 564 02ff 488B0CF2 		movq	(%rdx,%rsi,8), %rcx	# *_120, _121
+ 565              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 566 0303 4885C9   		testq	%rcx, %rcx	# _121
+ 567 0306 0F852C02 		jne	.L111	#,
+ 567      0000
+ 568              	.L72:
+ 569              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 570 030c 40F6C601 		testb	$1, %sil	#, _26
+ 571 0310 0F851A01 		jne	.L73	#,
+ 571      0000
+ 572              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 573 0316 4531D2   		xorl	%r10d, %r10d	# _127
+ 574              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 575 0319 4989F3   		movq	%rsi, %r11	# _26, _128
+ 576              	# multithreaded_bitshift.cpp:153:         return 0;
+ 577 031c 31D2     		xorl	%edx, %edx	# currPathLen
+ 578              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 579 031e F3440FBC 		rep bsfl	%esi, %r10d	# _26, _127
+ 579      D6
+ 580              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 581 0323 4489D1   		movl	%r10d, %ecx	# _127, tmp285
+ 582 0326 49D3FB   		sarq	%cl, %r11	# tmp285, _128
+ 583              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 584 0329 4983FB01 		cmpq	$1, %r11	#, _128
+ 585 032d 744E     		je	.L74	#,
+ 586              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 587 032f 4C39D8   		cmpq	%r11, %rax	# _128, prephitmp_333
+ 588 0332 7E10     		jle	.L75	#,
+ 589              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 590 0334 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 590      000000
+ 591 033b 4A8B14DA 		movq	(%rdx,%r11,8), %rdx	# *_147, currPathLen
+ 592              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 593 033f 4885D2   		testq	%rdx, %rdx	# currPathLen
+ 594 0342 7539     		jne	.L74	#,
+ 595              	.L75:
+ 596              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 597 0344 41F6C301 		testb	$1, %r11b	#, _128
+ 598 0348 0F848201 		je	.L112	#,
+ 598      0000
+ 599              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 600 034e 4B8D7C1B 		leaq	1(%r11,%r11), %rdi	#, tmp249
+ 600      01
+ 601              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 602 0353 4C01DF   		addq	%r11, %rdi	# _128, tmp250
+ 603 0356 E8000000 		call	_Z10collatzRecl	#
+ 603      00
+ 604              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 605 035b 488D5001 		leaq	1(%rax), %rdx	#, currPathLen
+ 606              	.L77:
+ 607              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 608 035f 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 608      000000
+ 609              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 610 0366 4939C3   		cmpq	%rax, %r11	# prephitmp_333, _128
+ 611 0369 7D12     		jge	.L74	#,
+ 612              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 613 036b 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 613      000000
+ 614 0372 4A8914D8 		movq	%rdx, (%rax,%r11,8)	# currPathLen, *_167
+ 615 0376 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 615      000000
+ 616              	.L74:
+ 617              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 618 037d 4963FA   		movslq	%r10d, %rdi	# _127, _127
+ 619              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 620 0380 4801D7   		addq	%rdx, %rdi	# currPathLen, currPathLen
+ 621 0383 488D4F01 		leaq	1(%rdi), %rcx	#, currPathLen
+ 622              	.L78:
+ 623              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 624 0387 4839C6   		cmpq	%rax, %rsi	# prephitmp_333, _26
+ 625 038a 0F8D2AFF 		jge	.L70	#,
+ 625      FFFF
+ 626              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 627 0390 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 627      000000
+ 628 0397 48893CF0 		movq	%rdi, (%rax,%rsi,8)	# currPathLen, *_140
+ 629 039b 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 629      000000
+ 630 03a2 E913FFFF 		jmp	.L70	#
+ 630      FF
+ 631 03a7 660F1F84 		.p2align 4,,10
+ 631      00000000 
+ 631      00
+ 632              		.p2align 3
+ 633              	.L60:
+ 634              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 635 03b0 4F8D5C12 		leaq	1(%r10,%r10), %r11	#, tmp229
+ 635      01
+ 636 03b5 BA010000 		movl	$1, %edx	#, currPathLen
+ 636      00
+ 637              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 638 03ba 4D01D3   		addq	%r10, %r11	# _20, _53
+ 639              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 640 03bd 4983FB01 		cmpq	$1, %r11	#, _53
+ 641 03c1 0F84D6FE 		je	.L65	#,
+ 641      FFFF
+ 642              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 643 03c7 4C39D8   		cmpq	%r11, %rax	# _53, prephitmp_333
+ 644 03ca 7E14     		jle	.L67	#,
+ 645              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 646 03cc 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 646      000000
+ 647 03d3 4A8B14DA 		movq	(%rdx,%r11,8), %rdx	# *_93, _94
+ 648              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 649 03d7 4885D2   		testq	%rdx, %rdx	# _94
+ 650 03da 0F856801 		jne	.L113	#,
+ 650      0000
+ 651              	.L67:
+ 652              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 653 03e0 41F6C301 		testb	$1, %r11b	#, _53
+ 654 03e4 0F840601 		je	.L114	#,
+ 654      0000
+ 655              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 656 03ea 4B8D7C1B 		leaq	1(%r11,%r11), %rdi	#, tmp235
+ 656      01
+ 657              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 658 03ef 4C01DF   		addq	%r11, %rdi	# _53, tmp236
+ 659 03f2 E8000000 		call	_Z10collatzRecl	#
+ 659      00
+ 660              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 661 03f7 488D4801 		leaq	1(%rax), %rcx	#, currPathLen
+ 662              	.L69:
+ 663              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 664 03fb 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 664      000000
+ 665 0402 488D5101 		leaq	1(%rcx), %rdx	#, currPathLen
+ 666              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 667 0406 4939C3   		cmpq	%rax, %r11	# prephitmp_333, _53
+ 668 0409 0F8D8EFE 		jge	.L65	#,
+ 668      FFFF
+ 669              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 670 040f 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 670      000000
+ 671 0416 4A890CD8 		movq	%rcx, (%rax,%r11,8)	# currPathLen, *_113
+ 672 041a 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 672      000000
+ 673 0421 E977FEFF 		jmp	.L65	#
+ 673      FF
+ 674 0426 662E0F1F 		.p2align 4,,10
+ 674      84000000 
+ 674      0000
+ 675              		.p2align 3
+ 676              	.L73:
+ 677              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 678 0430 4C8D5436 		leaq	1(%rsi,%rsi), %r10	#, tmp254
+ 678      01
+ 679              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 680 0435 4901F2   		addq	%rsi, %r10	# _26, _134
+ 681              	# multithreaded_bitshift.cpp:152:     if (x == 1) {
+ 682 0438 4983FA01 		cmpq	$1, %r10	#, _134
+ 683 043c 0F841601 		je	.L90	#,
+ 683      0000
+ 684              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 685 0442 4C39D0   		cmpq	%r10, %rax	# _134, prephitmp_333
+ 686 0445 7E1C     		jle	.L80	#,
+ 687              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 688 0447 488B1500 		movq	memo(%rip), %rdx	# memo, memo
+ 688      000000
+ 689 044e 4A8B14D2 		movq	(%rdx,%r10,8), %rdx	# *_174, _175
+ 690 0452 488D7A01 		leaq	1(%rdx), %rdi	#, currPathLen
+ 691 0456 488D4A02 		leaq	2(%rdx), %rcx	#, currPathLen
+ 692              	# multithreaded_bitshift.cpp:155:     if (x < N && memo[x] != 0) {
+ 693 045a 4885D2   		testq	%rdx, %rdx	# _175
+ 694 045d 0F8524FF 		jne	.L78	#,
+ 694      FFFF
+ 695              	.L80:
+ 696              	# multithreaded_bitshift.cpp:159:     if (x % 2 == 0) {
+ 697 0463 41F6C201 		testb	$1, %r10b	#, _134
+ 698 0467 7447     		je	.L115	#,
+ 699              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 700 0469 4B8D7C12 		leaq	1(%r10,%r10), %rdi	#, tmp260
+ 700      01
+ 701              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 702 046e 4C01D7   		addq	%r10, %rdi	# _134, tmp261
+ 703 0471 E8000000 		call	_Z10collatzRecl	#
+ 703      00
+ 704              	# multithreaded_bitshift.cpp:164:         currPathLen = collatzRec(((x << 1) | 1) + x) + 1;
+ 705 0476 488D5001 		leaq	1(%rax), %rdx	#, currPathLen
+ 706              	.L82:
+ 707              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 708 047a 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 708      000000
+ 709 0481 488D7A01 		leaq	1(%rdx), %rdi	#, currPathLen
+ 710 0485 488D4A02 		leaq	2(%rdx), %rcx	#, currPathLen
+ 711              	# multithreaded_bitshift.cpp:166:     if (x < N) {
+ 712 0489 4939C2   		cmpq	%rax, %r10	# prephitmp_333, _134
+ 713 048c 0F8DF5FE 		jge	.L78	#,
+ 713      FFFF
+ 714              	# multithreaded_bitshift.cpp:167:         memo[x] = currPathLen;
+ 715 0492 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 715      000000
+ 716 0499 4A8914D0 		movq	%rdx, (%rax,%r10,8)	# currPathLen, *_194
+ 717 049d 488B0500 		movq	N(%rip), %rax	# N, prephitmp_333
+ 717      000000
+ 718 04a4 E9DEFEFF 		jmp	.L78	#
+ 718      FF
+ 719 04a9 0F1F8000 		.p2align 4,,10
+ 719      000000
+ 720              		.p2align 3
+ 721              	.L115:
+ 722              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 723 04b0 4531DB   		xorl	%r11d, %r11d	# _181
+ 724              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 725 04b3 4C89D7   		movq	%r10, %rdi	# _134, tmp257
+ 726              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 727 04b6 F3450FBC 		rep bsfl	%r10d, %r11d	# _134, _181
+ 727      DA
+ 728              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 729 04bb 4489D9   		movl	%r11d, %ecx	# _181, tmp289
+ 730 04be 48D3FF   		sarq	%cl, %rdi	# tmp289, tmp257
+ 731 04c1 E8000000 		call	_Z10collatzRecl	#
+ 731      00
+ 732              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 733 04c6 4963D3   		movslq	%r11d, %rdx	# _181, _181
+ 734              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 735 04c9 4801C2   		addq	%rax, %rdx	# tmp274, currPathLen
+ 736 04cc EBAC     		jmp	.L82	#
+ 737 04ce 6690     		.p2align 4,,10
+ 738              		.p2align 3
+ 739              	.L112:
+ 740              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 741 04d0 31ED     		xorl	%ebp, %ebp	# _154
+ 742              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 743 04d2 4C89DF   		movq	%r11, %rdi	# _128, tmp246
+ 744              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 745 04d5 F3410FBC 		rep bsfl	%r11d, %ebp	# _128, _154
+ 745      EB
+ 746              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 747 04da 89E9     		movl	%ebp, %ecx	# _154, tmp287
+ 748 04dc 48D3FF   		sarq	%cl, %rdi	# tmp287, tmp246
+ 749 04df E8000000 		call	_Z10collatzRecl	#
+ 749      00
+ 750              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 751 04e4 4863D5   		movslq	%ebp, %rdx	# _154, _154
+ 752              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 753 04e7 4801C2   		addq	%rax, %rdx	# tmp272, currPathLen
+ 754 04ea E970FEFF 		jmp	.L77	#
+ 754      FF
+ 755 04ef 90       		.p2align 4,,10
+ 756              		.p2align 3
+ 757              	.L114:
+ 758              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 759 04f0 31ED     		xorl	%ebp, %ebp	# _100
+ 760              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 761 04f2 4C89DF   		movq	%r11, %rdi	# _53, tmp232
+ 762              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 763 04f5 F3410FBC 		rep bsfl	%r11d, %ebp	# _53, _100
+ 763      EB
+ 764              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 765 04fa 89E9     		movl	%ebp, %ecx	# _100, tmp283
+ 766 04fc 48D3FF   		sarq	%cl, %rdi	# tmp283, tmp232
+ 767 04ff E8000000 		call	_Z10collatzRecl	#
+ 767      00
+ 768              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 769 0504 4863CD   		movslq	%ebp, %rcx	# _100, _100
+ 770              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 771 0507 4801C1   		addq	%rax, %rcx	# tmp270, currPathLen
+ 772 050a E9ECFEFF 		jmp	.L69	#
+ 772      FF
+ 773 050f 90       		.p2align 4,,10
+ 774              		.p2align 3
+ 775              	.L110:
+ 776              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 777 0510 4531E4   		xorl	%r12d, %r12d	# _73
+ 778              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 779 0513 4889EF   		movq	%rbp, %rdi	# _47, tmp221
+ 780              	# multithreaded_bitshift.cpp:176:     return (uint8_t)__builtin_ctz(x);
+ 781 0516 F3440FBC 		rep bsfl	%ebp, %r12d	# _47, _73
+ 781      E5
+ 782              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 783 051b 4489E1   		movl	%r12d, %ecx	# _73, tmp281
+ 784 051e 48D3FF   		sarq	%cl, %rdi	# tmp281, tmp221
+ 785 0521 E8000000 		call	_Z10collatzRecl	#
+ 785      00
+ 786              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 787 0526 4963CC   		movslq	%r12d, %rcx	# _73, _73
+ 788              	# multithreaded_bitshift.cpp:161:         currPathLen = collatzRec(x >> trailingZeros) + (int64_t)t
+ 789 0529 4801C1   		addq	%rax, %rcx	# tmp268, currPathLen
+ 790 052c E948FDFF 		jmp	.L64	#
+ 790      FF
+ 791              		.p2align 4,,10
+ 792 0531 0F1F8000 		.p2align 3
+ 792      000000
+ 793              	.L111:
+ 794 0538 4883C101 		addq	$1, %rcx	#, currPathLen
+ 795 053c E979FDFF 		jmp	.L70	#
+ 795      FF
+ 796              		.p2align 4,,10
+ 797 0541 0F1F8000 		.p2align 3
+ 797      000000
+ 798              	.L113:
+ 799 0548 4883C201 		addq	$1, %rdx	#, currPathLen
+ 800 054c E94CFDFF 		jmp	.L65	#
+ 800      FF
+ 801              		.p2align 4,,10
+ 802 0551 0F1F8000 		.p2align 3
+ 802      000000
+ 803              	.L90:
+ 804 0558 BF010000 		movl	$1, %edi	#, currPathLen
+ 804      00
+ 805 055d B9020000 		movl	$2, %ecx	#, currPathLen
+ 805      00
+ 806 0562 E920FEFF 		jmp	.L78	#
+ 806      FF
+ 807 0567 660F1F84 		.p2align 4,,10
+ 807      00000000 
+ 807      00
+ 808              		.p2align 3
+ 809              	.L107:
+ 810              		.cfi_def_cfa_offset 8
+ 811              		.cfi_restore 3
+ 812              		.cfi_restore 6
+ 813              		.cfi_restore 12
+ 814 0570 C3       		ret	
+ 815              		.cfi_endproc
+ 816              	.LFE3617:
+ 818              		.section	.rodata.str1.1,"aMS",@progbits,1
+ 819              	.LC0:
+ 820 0000 3A2000   		.string	": "
+ 821              		.text
+ 822 0571 66662E0F 		.p2align 4
+ 822      1F840000 
+ 822      0000000F 
+ 822      1F4000
+ 823              		.globl	_Z14printMemoArrayv
+ 825              	_Z14printMemoArrayv:
+ 826              	.LFB3622:
+ 827              		.cfi_startproc
+ 828 0580 F30F1EFA 		endbr64	
+ 829              	# multithreaded_bitshift.cpp:181:     for (uint64_t i = 0; i < N; i++) {
+ 830 0584 48833D00 		cmpq	$0, N(%rip)	#, N
+ 830      00000000 
+ 831 058c 0F84DE00 		je	.L126	#,
+ 831      0000
+ 832              	# multithreaded_bitshift.cpp:180: void printMemoArray() {
+ 833 0592 4155     		pushq	%r13	#
+ 834              		.cfi_def_cfa_offset 16
+ 835              		.cfi_offset 13, -16
+ 836 0594 4154     		pushq	%r12	#
+ 837              		.cfi_def_cfa_offset 24
+ 838              		.cfi_offset 12, -24
+ 839 0596 4C8D2500 		leaq	_ZNKSt5ctypeIcE8do_widenEc(%rip), %r12	#, tmp111
+ 839      000000
+ 840 059d 55       		pushq	%rbp	#
+ 841              		.cfi_def_cfa_offset 32
+ 842              		.cfi_offset 6, -32
+ 843 059e 53       		pushq	%rbx	#
+ 844              		.cfi_def_cfa_offset 40
+ 845              		.cfi_offset 3, -40
+ 846 059f 31DB     		xorl	%ebx, %ebx	# i
+ 847 05a1 4883EC08 		subq	$8, %rsp	#,
+ 848              		.cfi_def_cfa_offset 48
+ 849 05a5 EB2F     		jmp	.L117	#
+ 850 05a7 660F1F84 		.p2align 4,,10
+ 850      00000000 
+ 850      00
+ 851              		.p2align 3
+ 852              	.L131:
+ 853 05b0 410FBE75 		movsbl	67(%r13), %esi	# MEM[(const struct ctype *)_25]._M_widen, _7
+ 853      43
+ 854              	.L120:
+ 855              	# /usr/include/c++/9/ostream:600:     { return flush(__os.put(__os.widen('\n'))); }
+ 856 05b5 4889EF   		movq	%rbp, %rdi	# _11,
+ 857              	# multithreaded_bitshift.cpp:181:     for (uint64_t i = 0; i < N; i++) {
+ 858 05b8 4883C301 		addq	$1, %rbx	#, i
+ 859              	# /usr/include/c++/9/ostream:600:     { return flush(__os.put(__os.widen('\n'))); }
+ 860 05bc E8000000 		call	_ZNSo3putEc@PLT	#
+ 860      00
+ 861 05c1 4889C7   		movq	%rax, %rdi	# tmp115, _23
+ 862              	# /usr/include/c++/9/ostream:622:     { return __os.flush(); }
+ 863 05c4 E8000000 		call	_ZNSo5flushEv@PLT	#
+ 863      00
+ 864              	# multithreaded_bitshift.cpp:181:     for (uint64_t i = 0; i < N; i++) {
+ 865 05c9 48391D00 		cmpq	%rbx, N(%rip)	# i, N
+ 865      000000
+ 866 05d0 0F868A00 		jbe	.L129	#,
+ 866      0000
+ 867              	.L117:
+ 868              	# /usr/include/c++/9/ostream:171:       { return _M_insert(__n); }
+ 869 05d6 4889DE   		movq	%rbx, %rsi	# i,
+ 870 05d9 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 870      000000
+ 871 05e0 E8000000 		call	_ZNSo9_M_insertImEERSoT_@PLT	#
+ 871      00
+ 872              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 873 05e5 BA020000 		movl	$2, %edx	#,
+ 873      00
+ 874 05ea 488D3500 		leaq	.LC0(%rip), %rsi	#,
+ 874      000000
+ 875 05f1 4889C7   		movq	%rax, %rdi	# _12,
+ 876              	# /usr/include/c++/9/ostream:171:       { return _M_insert(__n); }
+ 877 05f4 4889C5   		movq	%rax, %rbp	# tmp112, _12
+ 878              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 879 05f7 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 879      00
+ 880              	# multithreaded_bitshift.cpp:182:         std::cout << i << ": " << memo[i] << std::endl;
+ 881 05fc 488B0500 		movq	memo(%rip), %rax	# memo, memo
+ 881      000000
+ 882              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 883 0603 4889EF   		movq	%rbp, %rdi	# _12,
+ 884 0606 488B34D8 		movq	(%rax,%rbx,8), %rsi	# *_5, *_5
+ 885 060a E8000000 		call	_ZNSo9_M_insertIlEERSoT_@PLT	#
+ 885      00
+ 886 060f 4889C5   		movq	%rax, %rbp	# tmp113, _11
+ 887              	# /usr/include/c++/9/ostream:600:     { return flush(__os.put(__os.widen('\n'))); }
+ 888 0612 488B00   		movq	(%rax), %rax	# MEM[(struct basic_ostream *)_11]._vptr.basic_ostream, MEM[(struct basic_ostrea
+ 889              	# /usr/include/c++/9/bits/basic_ios.h:450:       { return __check_facet(_M_ctype).widen(__c); }
+ 890 0615 488B40E8 		movq	-24(%rax), %rax	# MEM[(long int *)_17 + -24B], MEM[(long int *)_17 + -24B]
+ 891 0619 4C8BAC05 		movq	240(%rbp,%rax), %r13	# MEM[(const struct basic_ios *)_20]._M_ctype, _25
+ 891      F0000000 
+ 892              	# /usr/include/c++/9/bits/basic_ios.h:49:       if (!__f)
+ 893 0621 4D85ED   		testq	%r13, %r13	# _25
+ 894 0624 744B     		je	.L130	#,
+ 895              	# /usr/include/c++/9/bits/locale_facets.h:874: 	if (_M_widen_ok)
+ 896 0626 41807D38 		cmpb	$0, 56(%r13)	#, MEM[(const struct ctype *)_25]._M_widen_ok
+ 896      00
+ 897 062b 7583     		jne	.L131	#,
+ 898              	# /usr/include/c++/9/bits/locale_facets.h:876: 	this->_M_widen_init();
+ 899 062d 4C89EF   		movq	%r13, %rdi	# _25,
+ 900 0630 E8000000 		call	_ZNKSt5ctypeIcE13_M_widen_initEv@PLT	#
+ 900      00
+ 901              	# /usr/include/c++/9/bits/locale_facets.h:877: 	return this->do_widen(__c);
+ 902 0635 498B4500 		movq	0(%r13), %rax	# MEM[(const struct ctype *)_25].D.43698._vptr.facet, MEM[(const struct ctype *
+ 903 0639 BE0A0000 		movl	$10, %esi	#, _7
+ 903      00
+ 904 063e 488B4030 		movq	48(%rax), %rax	# MEM[(int (*) () *)_34 + 48B], _35
+ 905 0642 4C39E0   		cmpq	%r12, %rax	# tmp111, _35
+ 906 0645 0F846AFF 		je	.L120	#,
+ 906      FFFF
+ 907              	# /usr/include/c++/9/bits/locale_facets.h:877: 	return this->do_widen(__c);
+ 908 064b 4C89EF   		movq	%r13, %rdi	# _25,
+ 909 064e FFD0     		call	*%rax	# _35
+ 910 0650 0FBEF0   		movsbl	%al, %esi	# tmp114, _7
+ 911 0653 E95DFFFF 		jmp	.L120	#
+ 911      FF
+ 912 0658 0F1F8400 		.p2align 4,,10
+ 912      00000000 
+ 913              		.p2align 3
+ 914              	.L129:
+ 915              	# multithreaded_bitshift.cpp:184: }
+ 916 0660 4883C408 		addq	$8, %rsp	#,
+ 917              		.cfi_def_cfa_offset 40
+ 918 0664 5B       		popq	%rbx	#
+ 919              		.cfi_def_cfa_offset 32
+ 920 0665 5D       		popq	%rbp	#
+ 921              		.cfi_def_cfa_offset 24
+ 922 0666 415C     		popq	%r12	#
+ 923              		.cfi_def_cfa_offset 16
+ 924 0668 415D     		popq	%r13	#
+ 925              		.cfi_def_cfa_offset 8
+ 926 066a C3       		ret	
+ 927 066b 0F1F4400 		.p2align 4,,10
+ 927      00
+ 928              		.p2align 3
+ 929              	.L126:
+ 930              		.cfi_restore 3
+ 931              		.cfi_restore 6
+ 932              		.cfi_restore 12
+ 933              		.cfi_restore 13
+ 934 0670 C3       		ret	
+ 935              	.L130:
+ 936              		.cfi_def_cfa_offset 48
+ 937              		.cfi_offset 3, -40
+ 938              		.cfi_offset 6, -32
+ 939              		.cfi_offset 12, -24
+ 940              		.cfi_offset 13, -16
+ 941              	# /usr/include/c++/9/bits/basic_ios.h:50: 	__throw_bad_cast();
+ 942 0671 E8000000 		call	_ZSt16__throw_bad_castv@PLT	#
+ 942      00
+ 943              		.cfi_endproc
+ 944              	.LFE3622:
+ 946              		.section	.text._ZNSt6vectorISt6threadSaIS0_EED2Ev,"axG",@progbits,_ZNSt6vectorISt6threadSaIS0_EED5
+ 947              		.align 2
+ 948              		.p2align 4
+ 949              		.weak	_ZNSt6vectorISt6threadSaIS0_EED2Ev
+ 951              	_ZNSt6vectorISt6threadSaIS0_EED2Ev:
+ 952              	.LFB3939:
+ 953              		.cfi_startproc
+ 954 0000 F30F1EFA 		endbr64	
+ 955              	# /usr/include/c++/9/bits/stl_vector.h:677: 	std::_Destroy(this->_M_impl._M_start, this->_M_impl._M
+ 956 0004 488B5708 		movq	8(%rdi), %rdx	# this_3(D)->D.74754._M_impl.D.74053._M_finish, _1
+ 957 0008 488B3F   		movq	(%rdi), %rdi	# this_3(D)->D.74754._M_impl.D.74053._M_start, _2
+ 958              	# /usr/include/c++/9/bits/stl_construct.h:107: 	  for (; __first != __last; ++__first)
+ 959 000b 4839FA   		cmpq	%rdi, %rdx	# _2, _1
+ 960 000e 7417     		je	.L133	#,
+ 961 0010 4889F8   		movq	%rdi, %rax	# _2, __first
+ 962              		.p2align 4,,10
+ 963 0013 0F1F4400 		.p2align 3
+ 963      00
+ 964              	.L135:
+ 965              	# /usr/include/c++/9/thread:138:       if (joinable())
+ 966 0018 48833800 		cmpq	$0, (%rax)	#, MEM[base: __first_16, offset: 0B]
+ 967 001c 751B     		jne	.L141	#,
+ 968              	# /usr/include/c++/9/bits/stl_construct.h:107: 	  for (; __first != __last; ++__first)
+ 969 001e 4883C008 		addq	$8, %rax	#, __first
+ 970              	# /usr/include/c++/9/bits/stl_construct.h:107: 	  for (; __first != __last; ++__first)
+ 971 0022 4839C2   		cmpq	%rax, %rdx	# __first, _1
+ 972 0025 75F1     		jne	.L135	#,
+ 973              	.L133:
+ 974              	# /usr/include/c++/9/bits/stl_vector.h:350: 	if (__p)
+ 975 0027 4885FF   		testq	%rdi, %rdi	# _2
+ 976 002a 740C     		je	.L132	#,
+ 977              	# /usr/include/c++/9/ext/new_allocator.h:128: 	::operator delete(__p);
+ 978 002c E9000000 		jmp	_ZdlPv@PLT	#
+ 978      00
+ 979              		.p2align 4,,10
+ 980 0031 0F1F8000 		.p2align 3
+ 980      000000
+ 981              	.L132:
+ 982 0038 C3       		ret	
+ 983              	.L141:
+ 984              	# /usr/include/c++/9/bits/stl_vector.h:675:       ~vector() _GLIBCXX_NOEXCEPT
+ 985 0039 4883EC08 		subq	$8, %rsp	#,
+ 986              		.cfi_def_cfa_offset 16
+ 987              	# /usr/include/c++/9/thread:139: 	std::terminate();
+ 988 003d E8000000 		call	_ZSt9terminatev@PLT	#
+ 988      00
+ 989              		.cfi_endproc
+ 990              	.LFE3939:
+ 992              		.weak	_ZNSt6vectorISt6threadSaIS0_EED1Ev
+ 993              		.set	_ZNSt6vectorISt6threadSaIS0_EED1Ev,_ZNSt6vectorISt6threadSaIS0_EED2Ev
+ 994              		.section	.rodata._ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_i
+ 995              	.LC1:
+ 996 0000 76656374 		.string	"vector::_M_realloc_insert"
+ 996      6F723A3A 
+ 996      5F4D5F72 
+ 996      65616C6C 
+ 996      6F635F69 
+ 997              		.section	.text._ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_ite
+ 998              		.align 2
+ 999              		.p2align 4
+ 1000              		.weak	_ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_iteratorIPS0
+ 1002              	_ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_iteratorIPS0_S2_EED
+ 1003              	.LFB4247:
+ 1004              		.cfi_startproc
+ 1005 0000 F30F1EFA 		endbr64	
+ 1006              	# /usr/include/c++/9/bits/stl_vector.h:1755: 	if (max_size() - size() < __n)
+ 1007 0004 48B9FFFF 		movabsq	$1152921504606846975, %rcx	#, tmp126
+ 1007      FFFFFFFF 
+ 1007      FF0F
+ 1008              	# /usr/include/c++/9/bits/vector.tcc:426:       vector<_Tp, _Alloc>::
+ 1009 000e 4157     		pushq	%r15	#
+ 1010              		.cfi_def_cfa_offset 16
+ 1011              		.cfi_offset 15, -16
+ 1012 0010 4156     		pushq	%r14	#
+ 1013              		.cfi_def_cfa_offset 24
+ 1014              		.cfi_offset 14, -24
+ 1015 0012 4155     		pushq	%r13	#
+ 1016              		.cfi_def_cfa_offset 32
+ 1017              		.cfi_offset 13, -32
+ 1018 0014 4154     		pushq	%r12	#
+ 1019              		.cfi_def_cfa_offset 40
+ 1020              		.cfi_offset 12, -40
+ 1021 0016 55       		pushq	%rbp	#
+ 1022              		.cfi_def_cfa_offset 48
+ 1023              		.cfi_offset 6, -48
+ 1024 0017 53       		pushq	%rbx	#
+ 1025              		.cfi_def_cfa_offset 56
+ 1026              		.cfi_offset 3, -56
+ 1027 0018 4883EC18 		subq	$24, %rsp	#,
+ 1028              		.cfi_def_cfa_offset 80
+ 1029              	# /usr/include/c++/9/bits/stl_vector.h:1755: 	if (max_size() - size() < __n)
+ 1030 001c 488B6F08 		movq	8(%rdi), %rbp	# MEM[(struct thread * *)this_15(D) + 8B], _55
+ 1031 0020 4C8B37   		movq	(%rdi), %r14	# MEM[(struct thread * *)this_15(D)], _54
+ 1032              	# /usr/include/c++/9/bits/stl_vector.h:916:       { return size_type(this->_M_impl._M_finish - this
+ 1033 0023 4889E8   		movq	%rbp, %rax	# _55, tmp124
+ 1034 0026 4C29F0   		subq	%r14, %rax	# _54, tmp124
+ 1035 0029 48C1F803 		sarq	$3, %rax	#, tmp125
+ 1036              	# /usr/include/c++/9/bits/stl_vector.h:1755: 	if (max_size() - size() < __n)
+ 1037 002d 4839C8   		cmpq	%rcx, %rax	# tmp126, tmp125
+ 1038 0030 0F843401 		je	.L161	#,
+ 1038      0000
+ 1039 0036 4889F3   		movq	%rsi, %rbx	# tmp143, __position
+ 1040 0039 4989FD   		movq	%rdi, %r13	# tmp142, this
+ 1041 003c 4C29F6   		subq	%r14, %rsi	# _54, _95
+ 1042              	# /usr/include/c++/9/bits/stl_algobase.h:227:       if (__a < __b)
+ 1043 003f 4885C0   		testq	%rax, %rax	# tmp125
+ 1044 0042 0F840001 		je	.L152	#,
+ 1044      0000
+ 1045 0048 49BFF8FF 		movabsq	$9223372036854775800, %r15	#, prephitmp_96
+ 1045      FFFFFFFF 
+ 1045      FF7F
+ 1046              	# /usr/include/c++/9/bits/stl_vector.h:1758: 	const size_type __len = size() + (std::max)(size(), _
+ 1047 0052 488D3C00 		leaq	(%rax,%rax), %rdi	#, __len
+ 1048              	# /usr/include/c++/9/bits/stl_vector.h:1759: 	return (__len < size() || __len > max_size()) ? max_s
+ 1049 0056 4839F8   		cmpq	%rdi, %rax	# __len, tmp125
+ 1050 0059 0F86D100 		jbe	.L162	#,
+ 1050      0000
+ 1051              	.L144:
+ 1052              	# /usr/include/c++/9/ext/new_allocator.h:114: 	return static_cast<_Tp*>(::operator new(__n * sizeof
+ 1053 005f 4C89FF   		movq	%r15, %rdi	# prephitmp_96,
+ 1054 0062 48895424 		movq	%rdx, 8(%rsp)	# __args#0, %sfp
+ 1054      08
+ 1055 0067 48893424 		movq	%rsi, (%rsp)	# _95, %sfp
+ 1056 006b E8000000 		call	_Znwm@PLT	#
+ 1056      00
+ 1057 0070 488B3424 		movq	(%rsp), %rsi	# %sfp, _95
+ 1058 0074 488B5424 		movq	8(%rsp), %rdx	# %sfp, __args#0
+ 1058      08
+ 1059 0079 4989C4   		movq	%rax, %r12	# tmp145, _52
+ 1060 007c 4A8D0438 		leaq	(%rax,%r15), %rax	#, prephitmp_69
+ 1061 0080 4D8D7C24 		leaq	8(%r12), %r15	#, prephitmp_31
+ 1061      08
+ 1062              	.L151:
+ 1063              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1064 0085 488B0A   		movq	(%rdx), %rcx	# MEM[(struct id &)__args#0_22(D)], MEM[(struct id &)__args#0_22(D)]
+ 1065              	# /usr/include/c++/9/bits/move.h:195:       __b = _GLIBCXX_MOVE(__tmp);
+ 1066 0088 48C70200 		movq	$0, (%rdx)	#, MEM[(struct id *)__args#0_22(D)]
+ 1066      000000
+ 1067              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1068 008f 49890C34 		movq	%rcx, (%r12,%rsi)	# MEM[(struct id &)__args#0_22(D)], MEM[(struct id *)_2]
+ 1069              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1070 0093 4C39F3   		cmpq	%r14, %rbx	# _54, __position
+ 1071 0096 742E     		je	.L146	#,
+ 1072              	# /usr/include/c++/9/bits/stl_uninitialized.h:948:       _ForwardIterator __cur = __result;
+ 1073 0098 4C89E1   		movq	%r12, %rcx	# _52, __cur
+ 1074              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1075 009b 4C89F2   		movq	%r14, %rdx	# _54, __first
+ 1076 009e 6690     		.p2align 4,,10
+ 1077              		.p2align 3
+ 1078              	.L147:
+ 1079              	# /usr/include/c++/9/thread:82:       id() noexcept : _M_thread() { }
+ 1080 00a0 48C70100 		movq	$0, (%rcx)	#, MEM[base: __cur_84, offset: 0B]
+ 1080      000000
+ 1081              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1082 00a7 488B32   		movq	(%rdx), %rsi	# MEM[base: __first_73, offset: 0], MEM[base: __first_73, offset: 0]
+ 1083              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1084 00aa 4883C208 		addq	$8, %rdx	#, __first
+ 1085 00ae 4883C108 		addq	$8, %rcx	#, __cur
+ 1086              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1087 00b2 488971F8 		movq	%rsi, -8(%rcx)	# MEM[base: __first_73, offset: 0], MEM[base: __cur_84, offset: 0B]
+ 1088              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1089 00b6 4839D3   		cmpq	%rdx, %rbx	# __first, __position
+ 1090 00b9 75E5     		jne	.L147	#,
+ 1091 00bb 4889DA   		movq	%rbx, %rdx	# __position, tmp130
+ 1092 00be 4C29F2   		subq	%r14, %rdx	# _54, tmp130
+ 1093 00c1 4D8D7C14 		leaq	8(%r12,%rdx), %r15	#, prephitmp_31
+ 1093      08
+ 1094              	.L146:
+ 1095 00c6 4839EB   		cmpq	%rbp, %rbx	# _55, __position
+ 1096 00c9 7427     		je	.L148	#,
+ 1097 00cb 4889DA   		movq	%rbx, %rdx	# __position, __first
+ 1098              	# /usr/include/c++/9/bits/stl_uninitialized.h:948:       _ForwardIterator __cur = __result;
+ 1099 00ce 4C89F9   		movq	%r15, %rcx	# prephitmp_31, __cur
+ 1100              		.p2align 4,,10
+ 1101 00d1 0F1F8000 		.p2align 3
+ 1101      000000
+ 1102              	.L149:
+ 1103              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1104 00d8 488B32   		movq	(%rdx), %rsi	# MEM[base: __first_3, offset: 0], MEM[base: __first_3, offset: 0]
+ 1105              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1106 00db 4883C208 		addq	$8, %rdx	#, __first
+ 1107 00df 4883C108 		addq	$8, %rcx	#, __cur
+ 1108              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1109 00e3 488971F8 		movq	%rsi, -8(%rcx)	# MEM[base: __first_3, offset: 0], MEM[base: __cur_74, offset: 0B]
+ 1110              	# /usr/include/c++/9/bits/stl_uninitialized.h:949:       for (; __first != __last; ++__first, (void
+ 1111 00e7 4839EA   		cmpq	%rbp, %rdx	# _55, __first
+ 1112 00ea 75EC     		jne	.L149	#,
+ 1113 00ec 4829DA   		subq	%rbx, %rdx	# __position, tmp136
+ 1114 00ef 4901D7   		addq	%rdx, %r15	# tmp136, prephitmp_31
+ 1115              	.L148:
+ 1116              	# /usr/include/c++/9/bits/stl_vector.h:350: 	if (__p)
+ 1117 00f2 4D85F6   		testq	%r14, %r14	# _54
+ 1118 00f5 7410     		je	.L150	#,
+ 1119              	# /usr/include/c++/9/ext/new_allocator.h:128: 	::operator delete(__p);
+ 1120 00f7 4C89F7   		movq	%r14, %rdi	# _54,
+ 1121 00fa 48890424 		movq	%rax, (%rsp)	# prephitmp_69, %sfp
+ 1122 00fe E8000000 		call	_ZdlPv@PLT	#
+ 1122      00
+ 1123 0103 488B0424 		movq	(%rsp), %rax	# %sfp, prephitmp_69
+ 1124              	.L150:
+ 1125              	# /usr/include/c++/9/bits/vector.tcc:502:       this->_M_impl._M_start = __new_start;
+ 1126 0107 66490F6E 		movq	%r12, %xmm0	# _52, tmp137
+ 1126      C4
+ 1127 010c 66490F6E 		movq	%r15, %xmm1	# prephitmp_31, prephitmp_31
+ 1127      CF
+ 1128              	# /usr/include/c++/9/bits/vector.tcc:504:       this->_M_impl._M_end_of_storage = __new_start + __l
+ 1129 0111 49894510 		movq	%rax, 16(%r13)	# prephitmp_69, this_15(D)->D.74754._M_impl.D.74053._M_end_of_storage
+ 1130              	# /usr/include/c++/9/bits/vector.tcc:502:       this->_M_impl._M_start = __new_start;
+ 1131 0115 660F6CC1 		punpcklqdq	%xmm1, %xmm0	# prephitmp_31, tmp137
+ 1132 0119 410F1145 		movups	%xmm0, 0(%r13)	# tmp137, MEM[(struct thread * *)this_15(D)]
+ 1132      00
+ 1133              	# /usr/include/c++/9/bits/vector.tcc:505:     }
+ 1134 011e 4883C418 		addq	$24, %rsp	#,
+ 1135              		.cfi_remember_state
+ 1136              		.cfi_def_cfa_offset 56
+ 1137 0122 5B       		popq	%rbx	#
+ 1138              		.cfi_def_cfa_offset 48
+ 1139 0123 5D       		popq	%rbp	#
+ 1140              		.cfi_def_cfa_offset 40
+ 1141 0124 415C     		popq	%r12	#
+ 1142              		.cfi_def_cfa_offset 32
+ 1143 0126 415D     		popq	%r13	#
+ 1144              		.cfi_def_cfa_offset 24
+ 1145 0128 415E     		popq	%r14	#
+ 1146              		.cfi_def_cfa_offset 16
+ 1147 012a 415F     		popq	%r15	#
+ 1148              		.cfi_def_cfa_offset 8
+ 1149 012c C3       		ret	
+ 1150 012d 0F1F00   		.p2align 4,,10
+ 1151              		.p2align 3
+ 1152              	.L162:
+ 1153              		.cfi_restore_state
+ 1154              	# /usr/include/c++/9/bits/stl_vector.h:343: 	return __n != 0 ? _Tr::allocate(_M_impl, __n) : pointe
+ 1155 0130 4885FF   		testq	%rdi, %rdi	# __len
+ 1156 0133 751E     		jne	.L145	#,
+ 1157 0135 41BF0800 		movl	$8, %r15d	#, prephitmp_31
+ 1157      0000
+ 1158 013b 31C0     		xorl	%eax, %eax	# prephitmp_69
+ 1159 013d 4531E4   		xorl	%r12d, %r12d	# _52
+ 1160 0140 E940FFFF 		jmp	.L151	#
+ 1160      FF
+ 1161              		.p2align 4,,10
+ 1162 0145 0F1F00   		.p2align 3
+ 1163              	.L152:
+ 1164 0148 41BF0800 		movl	$8, %r15d	#, prephitmp_96
+ 1164      0000
+ 1165 014e E90CFFFF 		jmp	.L144	#
+ 1165      FF
+ 1166              	.L145:
+ 1167 0153 4839CF   		cmpq	%rcx, %rdi	# tmp126, __len
+ 1168 0156 4889C8   		movq	%rcx, %rax	# tmp126, tmp126
+ 1169 0159 480F46C7 		cmovbe	%rdi, %rax	# __len,, tmp126
+ 1170 015d 4C8D3CC5 		leaq	0(,%rax,8), %r15	#, prephitmp_96
+ 1170      00000000 
+ 1171 0165 E9F5FEFF 		jmp	.L144	#
+ 1171      FF
+ 1172              	.L161:
+ 1173              	# /usr/include/c++/9/bits/stl_vector.h:1756: 	  __throw_length_error(__N(__s));
+ 1174 016a 488D3D00 		leaq	.LC1(%rip), %rdi	#,
+ 1174      000000
+ 1175 0171 E8000000 		call	_ZSt20__throw_length_errorPKc@PLT	#
+ 1175      00
+ 1176              		.cfi_endproc
+ 1177              	.LFE4247:
+ 1179              		.section	.rodata.str1.8,"aMS",@progbits,1
+ 1180              		.align 8
+ 1181              	.LC2:
+ 1182 0000 50726F67 		.string	"Program takes two arguments: N and nThreads"
+ 1182      72616D20 
+ 1182      74616B65 
+ 1182      73207477 
+ 1182      6F206172 
+ 1183 002c 00000000 		.align 8
+ 1184              	.LC3:
+ 1185 0030 49662079 		.string	"If you add 'rec' as third argument, you will run the"
+ 1185      6F752061 
+ 1185      64642027 
+ 1185      72656327 
+ 1185      20617320 
+ 1186 0065 000000   		.align 8
+ 1187              	.LC4:
+ 1188 0068 20657870 		.string	" experimental recursive version."
+ 1188      6572696D 
+ 1188      656E7461 
+ 1188      6C207265 
+ 1188      63757273 
+ 1189 0089 00000000 		.align 8
+ 1189      000000
+ 1190              	.LC5:
+ 1191 0090 4966206F 		.string	"If only one parameter is given, nThreads will default to 4"
+ 1191      6E6C7920 
+ 1191      6F6E6520 
+ 1191      70617261 
+ 1191      6D657465 
+ 1192 00cb 00000000 		.align 8
+ 1192      00
+ 1193              	.LC6:
+ 1194 00d0 45697468 		.string	"Either way, you cannot run the program with 0 args..."
+ 1194      65722077 
+ 1194      61792C20 
+ 1194      796F7520 
+ 1194      63616E6E 
+ 1195              		.section	.rodata.str1.1
+ 1196              	.LC7:
+ 1197 0003 72656300 		.string	"rec"
+ 1198              		.section	.rodata.str1.8
+ 1199 0106 0000     		.align 8
+ 1200              	.LC8:
+ 1201 0108 4572726F 		.string	"Error: you specified nThreads > N. Aborting."
+ 1201      723A2079 
+ 1201      6F752073 
+ 1201      70656369 
+ 1201      66696564 
+ 1202              		.section	.rodata.str1.1
+ 1203              	.LC9:
+ 1204 0007 436F6E66 		.string	"Configuration: N = "
+ 1204      69677572 
+ 1204      6174696F 
+ 1204      6E3A204E 
+ 1204      203D2000 
+ 1205              	.LC10:
+ 1206 001b 2C206E54 		.string	", nThreads = "
+ 1206      68726561 
+ 1206      6473203D 
+ 1206      2000
+ 1207              		.section	.rodata.str1.8
+ 1208 0135 000000   		.align 8
+ 1209              	.LC11:
+ 1210 0138 5761726E 		.string	"Warning: you are running the experimental recursive algorithm"
+ 1210      696E673A 
+ 1210      20796F75 
+ 1210      20617265 
+ 1210      2072756E 
+ 1211              		.section	.rodata.str1.1
+ 1212              	.LC12:
+ 1213 0029 00       		.string	""
+ 1214              	.LC13:
+ 1215 002a 54696D65 		.string	"Time to run "
+ 1215      20746F20 
+ 1215      72756E20 
+ 1215      00
+ 1216              	.LC14:
+ 1217 0037 206E756D 		.string	" numbers: "
+ 1217      62657273 
+ 1217      3A2000
+ 1218              	.LC15:
+ 1219 0042 206D7300 		.string	" ms"
+ 1220              		.section	.text.unlikely,"ax",@progbits
+ 1221              	.LCOLDB16:
+ 1222              		.section	.text.startup,"ax",@progbits
+ 1223              	.LHOTB16:
+ 1224              		.p2align 4
+ 1225              		.globl	main
+ 1227              	main:
+ 1228              	.LFB3598:
+ 1229              		.cfi_startproc
+ 1230              		.cfi_personality 0x9b,DW.ref.__gxx_personality_v0
+ 1231              		.cfi_lsda 0x1b,.LLSDA3598
+ 1232 0000 F30F1EFA 		endbr64	
+ 1233 0004 4157     		pushq	%r15	#
+ 1234              		.cfi_def_cfa_offset 16
+ 1235              		.cfi_offset 15, -16
+ 1236 0006 4156     		pushq	%r14	#
+ 1237              		.cfi_def_cfa_offset 24
+ 1238              		.cfi_offset 14, -24
+ 1239 0008 4155     		pushq	%r13	#
+ 1240              		.cfi_def_cfa_offset 32
+ 1241              		.cfi_offset 13, -32
+ 1242 000a 4154     		pushq	%r12	#
+ 1243              		.cfi_def_cfa_offset 40
+ 1244              		.cfi_offset 12, -40
+ 1245 000c 55       		pushq	%rbp	#
+ 1246              		.cfi_def_cfa_offset 48
+ 1247              		.cfi_offset 6, -48
+ 1248 000d 53       		pushq	%rbx	#
+ 1249              		.cfi_def_cfa_offset 56
+ 1250              		.cfi_offset 3, -56
+ 1251 000e 4863DF   		movslq	%edi, %rbx	# tmp287,
+ 1252 0011 4883EC68 		subq	$104, %rsp	#,
+ 1253              		.cfi_def_cfa_offset 160
+ 1254              	# multithreaded_bitshift.cpp:38: int main(int argc, char **argv) {
+ 1255 0015 64488B04 		movq	%fs:40, %rax	# MEM[(<address-space-1> long unsigned int *)40B], tmp311
+ 1255      25280000 
+ 1255      00
+ 1256 001e 48894424 		movq	%rax, 88(%rsp)	# tmp311, D.89132
+ 1256      58
+ 1257 0023 31C0     		xorl	%eax, %eax	# tmp311
+ 1258              	# multithreaded_bitshift.cpp:40:     if (argc < 2) {
+ 1259 0025 83FB01   		cmpl	$1, %ebx	#, argc
+ 1260 0028 0F8EED04 		jle	.L229	#,
+ 1260      0000
+ 1261 002e 4889F5   		movq	%rsi, %rbp	# tmp288, argv
+ 1262              	# multithreaded_bitshift.cpp:48:     else if (argc == 2) {
+ 1263 0031 83FB02   		cmpl	$2, %ebx	#, argc
+ 1264 0034 0F85C702 		jne	.L166	#,
+ 1264      0000
+ 1265              	# multithreaded_bitshift.cpp:49:         nThreads = 4;
+ 1266 003a 66C70500 		movw	$4, nThreads(%rip)	#, nThreads
+ 1266      00000004 
+ 1266      00
+ 1267              	.L167:
+ 1268              	# multithreaded_bitshift.cpp:54:     if (strcmp("rec", argv[argc-1]) == 0) {
+ 1269 0043 488B7CDD 		movq	-8(%rbp,%rbx,8), %rdi	# *_6, *_6
+ 1269      F8
+ 1270 0048 B9040000 		movl	$4, %ecx	#, tmp191
+ 1270      00
+ 1271 004d 488D3500 		leaq	.LC7(%rip), %rsi	#, tmp186
+ 1271      000000
+ 1272 0054 F3A6     		repz cmpsb
+ 1273 0056 0F97C0   		seta	%al	#, tmp192
+ 1274 0059 1C00     		sbbb	$0, %al	# _8
+ 1275              	# multithreaded_bitshift.cpp:54:     if (strcmp("rec", argv[argc-1]) == 0) {
+ 1276 005b 84C0     		testb	%al, %al	# _8
+ 1277 005d 7515     		jne	.L168	#,
+ 1278              	# multithreaded_bitshift.cpp:56:         thrFunc = &collatzThreadRec;
+ 1279 005f 488D0500 		leaq	_Z16collatzThreadRecllt(%rip), %rax	#, tmp313
+ 1279      000000
+ 1280              	# multithreaded_bitshift.cpp:55:         recursive = true;
+ 1281 0066 C6050000 		movb	$1, recursive(%rip)	#, recursive
+ 1281      000001
+ 1282              	# multithreaded_bitshift.cpp:56:         thrFunc = &collatzThreadRec;
+ 1283 006d 48890500 		movq	%rax, thrFunc(%rip)	# tmp313, thrFunc
+ 1283      000000
+ 1284              	.L168:
+ 1285              	# /usr/include/stdlib.h:363:   return (int) strtol (__nptr, (char **) NULL, 10);
+ 1286 0074 488B7D08 		movq	8(%rbp), %rdi	# MEM[(char * *)argv_60(D) + 8B], MEM[(char * *)argv_60(D) + 8B]
+ 1287 0078 BA0A0000 		movl	$10, %edx	#,
+ 1287      00
+ 1288 007d 31F6     		xorl	%esi, %esi	#
+ 1289 007f E8000000 		call	strtol@PLT	#
+ 1289      00
+ 1290              	# multithreaded_bitshift.cpp:61:     if (N < nThreads) {
+ 1291 0084 0FB70D00 		movzwl	nThreads(%rip), %ecx	# nThreads, _13
+ 1291      000000
+ 1292              	# multithreaded_bitshift.cpp:60:     N = (int64_t) atoi(argv[1]) + 1;
+ 1293 008b 4863F8   		movslq	%eax, %rdi	# tmp290, _94
+ 1294              	# multithreaded_bitshift.cpp:60:     N = (int64_t) atoi(argv[1]) + 1;
+ 1295 008e 4883C701 		addq	$1, %rdi	#, _11
+ 1296              	# multithreaded_bitshift.cpp:60:     N = (int64_t) atoi(argv[1]) + 1;
+ 1297 0092 48893D00 		movq	%rdi, N(%rip)	# _11, N
+ 1297      000000
+ 1298              	# multithreaded_bitshift.cpp:61:     if (N < nThreads) {
+ 1299 0099 4839CF   		cmpq	%rcx, %rdi	# _13, _11
+ 1300 009c 0F8C4E04 		jl	.L230	#,
+ 1300      0000
+ 1301              	# multithreaded_bitshift.cpp:65:     int64_t numPerThread = N / nThreads;
+ 1302 00a2 4889F8   		movq	%rdi, %rax	# _11, tmp197
+ 1303              	# multithreaded_bitshift.cpp:69:     memo = new int64_t[N];
+ 1304 00a5 48C1E703 		salq	$3, %rdi	#, tmp199
+ 1305              	# multithreaded_bitshift.cpp:65:     int64_t numPerThread = N / nThreads;
+ 1306 00a9 4899     		cqto
+ 1307 00ab 48F7F9   		idivq	%rcx	# _13
+ 1308 00ae 48894424 		movq	%rax, 16(%rsp)	# tmp197, %sfp
+ 1308      10
+ 1309              	.LEHB0:
+ 1310              	# multithreaded_bitshift.cpp:69:     memo = new int64_t[N];
+ 1311 00b3 E8000000 		call	_Znam@PLT	#
+ 1311      00
+ 1312              	.LEHE0:
+ 1313              	# multithreaded_bitshift.cpp:70:     for (int64_t i = 0; i < N; i++) {
+ 1314 00b8 488B1500 		movq	N(%rip), %rdx	# N, N.7_188
+ 1314      000000
+ 1315              	# multithreaded_bitshift.cpp:69:     memo = new int64_t[N];
+ 1316 00bf 48890500 		movq	%rax, memo(%rip)	# tmp200, memo
+ 1316      000000
+ 1317              	# multithreaded_bitshift.cpp:69:     memo = new int64_t[N];
+ 1318 00c6 4889C7   		movq	%rax, %rdi	# tmp291, tmp200
+ 1319              	# multithreaded_bitshift.cpp:70:     for (int64_t i = 0; i < N; i++) {
+ 1320 00c9 4885D2   		testq	%rdx, %rdx	# N.7_188
+ 1321 00cc 7E0B     		jle	.L172	#,
+ 1322              	# multithreaded_bitshift.cpp:71:         memo[i] = 0;
+ 1323 00ce 48C1E203 		salq	$3, %rdx	#, tmp202
+ 1324 00d2 31F6     		xorl	%esi, %esi	#
+ 1325 00d4 E8000000 		call	memset@PLT	#
+ 1325      00
+ 1326              	.L172:
+ 1327              	# /usr/include/c++/9/bits/stl_vector.h:95: 	: _M_start(), _M_finish(), _M_end_of_storage()
+ 1328 00d9 660FEFC0 		pxor	%xmm0, %xmm0	# tmp201
+ 1329 00dd 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1329      40
+ 1330              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1331 00e2 BA130000 		movl	$19, %edx	#,
+ 1331      00
+ 1332              	# /usr/include/c++/9/bits/stl_vector.h:95: 	: _M_start(), _M_finish(), _M_end_of_storage()
+ 1333 00e7 48C74424 		movq	$0, 80(%rsp)	#, MEM[(struct _Vector_impl_data *)&threads]._M_end_of_storage
+ 1333      50000000 
+ 1333      00
+ 1334              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1335 00f0 488D3500 		leaq	.LC9(%rip), %rsi	#,
+ 1335      000000
+ 1336 00f7 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1336      000000
+ 1337 00fe 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1337      08
+ 1338              	# /usr/include/c++/9/bits/stl_vector.h:95: 	: _M_start(), _M_finish(), _M_end_of_storage()
+ 1339 0103 0F294424 		movaps	%xmm0, 64(%rsp)	# tmp201, MEM[(struct thread * *)&threads]
+ 1339      40
+ 1340              	.LEHB1:
+ 1341              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1342 0108 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1342      00
+ 1343              	# multithreaded_bitshift.cpp:78:     std::cout << "Configuration: N = " << N-1 << ", nThreads = " <
+ 1344 010d 488B0500 		movq	N(%rip), %rax	# N, tmp316
+ 1344      000000
+ 1345              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1346 0114 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1346      000000
+ 1347              	# multithreaded_bitshift.cpp:78:     std::cout << "Configuration: N = " << N-1 << ", nThreads = " <
+ 1348 011b 488D70FF 		leaq	-1(%rax), %rsi	#, tmp207
+ 1349 011f 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1349      40
+ 1350 0124 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1350      08
+ 1351              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1352 0129 E8000000 		call	_ZNSo9_M_insertIlEERSoT_@PLT	#
+ 1352      00
+ 1353 012e 4889C5   		movq	%rax, %rbp	# tmp292, _110
+ 1354              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1355 0131 BA0D0000 		movl	$13, %edx	#,
+ 1355      00
+ 1356 0136 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1356      40
+ 1357 013b 488D3500 		leaq	.LC10(%rip), %rsi	#,
+ 1357      000000
+ 1358 0142 4889EF   		movq	%rbp, %rdi	# _110,
+ 1359 0145 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1359      08
+ 1360 014a E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1360      00
+ 1361              	# /usr/include/c++/9/ostream:185: 	return _M_insert(static_cast<unsigned long>(__n));
+ 1362 014f 0FB73500 		movzwl	nThreads(%rip), %esi	# nThreads, nThreads
+ 1362      000000
+ 1363 0156 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1363      40
+ 1364 015b 4889EF   		movq	%rbp, %rdi	# _110,
+ 1365 015e 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1365      08
+ 1366 0163 E8000000 		call	_ZNSo9_M_insertImEERSoT_@PLT	#
+ 1366      00
+ 1367 0168 4889C7   		movq	%rax, %rdi	# tmp293, _112
+ 1368 016b 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1368      40
+ 1369 0170 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1369      08
+ 1370              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1371 0175 E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1371      00
+ 1372              	# multithreaded_bitshift.cpp:79:     if (recursive) {
+ 1373 017a 803D0000 		cmpb	$0, recursive(%rip)	#, recursive
+ 1373      000000
+ 1374 0181 7438     		je	.L173	#,
+ 1375 0183 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1375      40
+ 1376              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1377 0188 BA3D0000 		movl	$61, %edx	#,
+ 1377      00
+ 1378 018d 488D3500 		leaq	.LC11(%rip), %rsi	#,
+ 1378      000000
+ 1379 0194 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1379      000000
+ 1380 019b 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1380      08
+ 1381 01a0 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1381      00
+ 1382 01a5 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1382      40
+ 1383              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1384 01aa 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1384      000000
+ 1385 01b1 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1385      08
+ 1386 01b6 E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1386      00
+ 1387              	.L173:
+ 1388 01bb 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1388      40
+ 1389              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1390 01c0 31D2     		xorl	%edx, %edx	#
+ 1391 01c2 488D3500 		leaq	.LC12(%rip), %rsi	#,
+ 1391      000000
+ 1392 01c9 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1392      000000
+ 1393 01d0 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1393      08
+ 1394 01d5 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1394      00
+ 1395 01da 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1395      40
+ 1396              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1397 01df 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1397      000000
+ 1398 01e6 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1398      08
+ 1399 01eb E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1399      00
+ 1400              	# multithreaded_bitshift.cpp:86:     auto start = std::chrono::high_resolution_clock::now();
+ 1401 01f0 E8000000 		call	_ZNSt6chrono3_V212system_clock3nowEv@PLT	#
+ 1401      00
+ 1402 01f5 48894424 		movq	%rax, 24(%rsp)	# tmp294, %sfp
+ 1402      18
+ 1403              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1404 01fa 0FB70500 		movzwl	nThreads(%rip), %eax	# nThreads,
+ 1404      000000
+ 1405 0201 89C5     		movl	%eax, %ebp	#,
+ 1406              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1407 0203 83E801   		subl	$1, %eax	#, _15
+ 1408              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1409 0206 85C0     		testl	%eax, %eax	# _15
+ 1410 0208 0F8E2C01 		jle	.L231	#,
+ 1410      0000
+ 1411 020e 488B4424 		movq	16(%rsp), %rax	# %sfp, tmp197
+ 1411      10
+ 1412              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1413 0213 31DB     		xorl	%ebx, %ebx	# i
+ 1414              	# multithreaded_bitshift.cpp:88:         uint64_t from = (i != 0) ? (i*numPerThread) : 2;
+ 1415 0215 BD020000 		movl	$2, %ebp	#, iftmp.15_47
+ 1415      00
+ 1416 021a 4C8D3500 		leaq	thrFunc(%rip), %r14	#, tmp275
+ 1416      000000
+ 1417              	# /usr/include/c++/9/thread:191: 	_State_impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__
+ 1418 0221 4C8D3D00 		leaq	16+_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE(%rip), %r15	#, tmp286
+ 1418      000000
+ 1419 0228 4883E801 		subq	$1, %rax	#, _82
+ 1420 022c 48890424 		movq	%rax, (%rsp)	# _82, %sfp
+ 1421 0230 488D4424 		leaq	64(%rsp), %rax	#, tmp274
+ 1421      40
+ 1422 0235 48894424 		movq	%rax, 8(%rsp)	# tmp274, %sfp
+ 1422      08
+ 1423 023a 660F1F44 		.p2align 4,,10
+ 1423      0000
+ 1424              		.p2align 3
+ 1425              	.L175:
+ 1426              	# multithreaded_bitshift.cpp:89:         uint64_t to = from + numPerThread - 1;
+ 1427 0240 488B0424 		movq	(%rsp), %rax	# %sfp, _82
+ 1428              	# /usr/include/c++/9/thread:206: 	return _State_ptr{new _Impl{std::forward<_Callable>(__f)}};
+ 1429 0244 BF280000 		movl	$40, %edi	#,
+ 1429      00
+ 1430              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1431 0249 4D8B2E   		movq	(%r14), %r13	# MEM[(void (*<Tc08d>) (long int, long int, short unsigned int) &)&thrFunc], _16
+ 1432              	# /usr/include/c++/9/thread:82:       id() noexcept : _M_thread() { }
+ 1433 024c 48C74424 		movq	$0, 40(%rsp)	#, MEM[(struct id *)&D.74899]._M_thread
+ 1433      28000000 
+ 1433      00
+ 1434              	# multithreaded_bitshift.cpp:89:         uint64_t to = from + numPerThread - 1;
+ 1435 0255 4C8D6405 		leaq	0(%rbp,%rax), %r12	#, _33
+ 1435      00
+ 1436              	# /usr/include/c++/9/thread:206: 	return _State_ptr{new _Impl{std::forward<_Callable>(__f)}};
+ 1437 025a E8000000 		call	_Znwm@PLT	#
+ 1437      00
+ 1438              	.LEHE1:
+ 1439              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1440 025f 66490F6E 		movq	%r12, %xmm0	# _33, tmp215
+ 1440      C4
+ 1441 0264 66480F6E 		movq	%rbp, %xmm1	# iftmp.15_47, iftmp.15_47
+ 1441      CD
+ 1442              	# /usr/include/c++/9/thread:191: 	_State_impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__
+ 1443 0269 4C8938   		movq	%r15, (%rax)	# tmp286, MEM[(struct _State_impl *)_176].D.82060._vptr._State
+ 1444              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1445 026c 4C8D6424 		leaq	40(%rsp), %r12	#, tmp272
+ 1445      28
+ 1446              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1447 0271 66895808 		movw	%bx, 8(%rax)	# i, MEM[(struct _Head_base *)_176 + 8B]._M_head_impl
+ 1448 0275 660F6CC1 		punpcklqdq	%xmm1, %xmm0	# iftmp.15_47, tmp215
+ 1449              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1450 0279 488D7424 		leaq	56(%rsp), %rsi	#, tmp216
+ 1450      38
+ 1451 027e 4C89E7   		movq	%r12, %rdi	# tmp272,
+ 1452              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1453 0281 4C896820 		movq	%r13, 32(%rax)	# _169, MEM[(struct _Head_base *)_176 + 32B]._M_head_impl
+ 1454              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1455 0285 488B1500 		movq	pthread_create@GOTPCREL(%rip), %rdx	#,
+ 1455      000000
+ 1456              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1457 028c 0F114010 		movups	%xmm0, 16(%rax)	# tmp215, MEM[(long unsigned int *)_176 + 16B]
+ 1458              	# /usr/include/c++/9/bits/unique_ptr.h:147:       __uniq_ptr_impl(pointer __p) : _M_t() { _M_ptr() 
+ 1459 0290 48894424 		movq	%rax, 56(%rsp)	# tmp213, MEM[(struct _State * &)&D.89060]
+ 1459      38
+ 1460              	.LEHB2:
+ 1461              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1462 0295 E8000000 		call	_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE@PLT	#
+ 1462      00
+ 1463              	.LEHE2:
+ 1464              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1465 029a 488B7C24 		movq	56(%rsp), %rdi	# MEM[(struct _State * &)&D.89060], _170
+ 1465      38
+ 1466              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1467 029f 4885FF   		testq	%rdi, %rdi	# _170
+ 1468 02a2 7406     		je	.L177	#,
+ 1469              	# /usr/include/c++/9/bits/unique_ptr.h:81: 	delete __ptr;
+ 1470 02a4 488B07   		movq	(%rdi), %rax	# _170->_vptr._State, _170->_vptr._State
+ 1471 02a7 FF5008   		call	*8(%rax)	# MEM[(int (*) () *)_171 + 8B]
+ 1472              	.L177:
+ 1473              	# /usr/include/c++/9/bits/vector.tcc:112: 	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_s
+ 1474 02aa 488B7424 		movq	72(%rsp), %rsi	# threads.D.74754._M_impl.D.74053._M_finish, _181
+ 1474      48
+ 1475              	# /usr/include/c++/9/bits/vector.tcc:112: 	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_s
+ 1476 02af 483B7424 		cmpq	80(%rsp), %rsi	# threads.D.74754._M_impl.D.74053._M_end_of_storage, _181
+ 1476      50
+ 1477 02b4 746A     		je	.L232	#,
+ 1478              	# /usr/include/c++/9/thread:82:       id() noexcept : _M_thread() { }
+ 1479 02b6 48C70600 		movq	$0, (%rsi)	#, MEM[(struct id *)_181]._M_thread
+ 1479      000000
+ 1480              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1481 02bd 488B4424 		movq	40(%rsp), %rax	# MEM[(struct id &)&D.74899], MEM[(struct id &)&D.74899]
+ 1481      28
+ 1482              	# /usr/include/c++/9/bits/vector.tcc:117: 	    ++this->_M_impl._M_finish;
+ 1483 02c2 4883C608 		addq	$8, %rsi	#, tmp228
+ 1484              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1485 02c6 488946F8 		movq	%rax, -8(%rsi)	# MEM[(struct id &)&D.74899], MEM[(struct id *)_181]
+ 1486              	# /usr/include/c++/9/bits/vector.tcc:117: 	    ++this->_M_impl._M_finish;
+ 1487 02ca 48897424 		movq	%rsi, 72(%rsp)	# tmp228, threads.D.74754._M_impl.D.74053._M_finish
+ 1487      48
+ 1488              	.L183:
+ 1489              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1490 02cf 0FB70500 		movzwl	nThreads(%rip), %eax	# nThreads,
+ 1490      000000
+ 1491              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1492 02d6 83C301   		addl	$1, %ebx	#, i
+ 1493              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1494 02d9 0FB7D3   		movzwl	%bx, %edx	# i, i
+ 1495              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1496 02dc 89C5     		movl	%eax, %ebp	#,
+ 1497              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1498 02de 83E801   		subl	$1, %eax	#, _15
+ 1499              	# multithreaded_bitshift.cpp:87:     for(uint16_t i = 0; i < nThreads-1; i++) {
+ 1500 02e1 39C2     		cmpl	%eax, %edx	# _15, i
+ 1501 02e3 7D5F     		jge	.L174	#,
+ 1502              	# multithreaded_bitshift.cpp:88:         uint64_t from = (i != 0) ? (i*numPerThread) : 2;
+ 1503 02e5 BD020000 		movl	$2, %ebp	#, iftmp.15_47
+ 1503      00
+ 1504 02ea 6685DB   		testw	%bx, %bx	# i
+ 1505 02ed 0F844DFF 		je	.L175	#,
+ 1505      FFFF
+ 1506              	# multithreaded_bitshift.cpp:88:         uint64_t from = (i != 0) ? (i*numPerThread) : 2;
+ 1507 02f3 0FB7EB   		movzwl	%bx, %ebp	# i, i
+ 1508              	# multithreaded_bitshift.cpp:88:         uint64_t from = (i != 0) ? (i*numPerThread) : 2;
+ 1509 02f6 480FAF6C 		imulq	16(%rsp), %rbp	# %sfp, iftmp.15_47
+ 1509      2410
+ 1510 02fc E93FFFFF 		jmp	.L175	#
+ 1510      FF
+ 1511              	.L166:
+ 1512              	# /usr/include/stdlib.h:363:   return (int) strtol (__nptr, (char **) NULL, 10);
+ 1513 0301 488B7E10 		movq	16(%rsi), %rdi	# MEM[(char * *)argv_60(D) + 16B], MEM[(char * *)argv_60(D) + 16B]
+ 1514 0305 BA0A0000 		movl	$10, %edx	#,
+ 1514      00
+ 1515 030a 31F6     		xorl	%esi, %esi	#
+ 1516 030c E8000000 		call	strtol@PLT	#
+ 1516      00
+ 1517              	# multithreaded_bitshift.cpp:52:         nThreads = atoi(argv[2]);
+ 1518 0311 66890500 		movw	%ax, nThreads(%rip)	# tmp289, nThreads
+ 1518      000000
+ 1519 0318 E926FDFF 		jmp	.L167	#
+ 1519      FF
+ 1520 031d 0F1F00   		.p2align 4,,10
+ 1521              		.p2align 3
+ 1522              	.L232:
+ 1523              	# /usr/include/c++/9/bits/vector.tcc:121: 	  _M_realloc_insert(end(), std::forward<_Args>(__args)..
+ 1524 0320 488B7C24 		movq	8(%rsp), %rdi	# %sfp,
+ 1524      08
+ 1525 0325 4C89E2   		movq	%r12, %rdx	# tmp272,
+ 1526              	.LEHB3:
+ 1527 0328 E8000000 		call	_ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_iteratorIPS0_
+ 1527      00
+ 1528              	.LEHE3:
+ 1529              	# /usr/include/c++/9/thread:138:       if (joinable())
+ 1530 032d 48837C24 		cmpq	$0, 40(%rsp)	#, MEM[(const struct thread *)&D.74899]
+ 1530      2800
+ 1531 0333 749A     		je	.L183	#,
+ 1532              	.L192:
+ 1533              	# /usr/include/c++/9/thread:139: 	std::terminate();
+ 1534 0335 E8000000 		call	_ZSt9terminatev@PLT	#
+ 1534      00
+ 1535              	.L231:
+ 1536 033a 488D4C24 		leaq	64(%rsp), %rcx	#, tmp274
+ 1536      40
+ 1537 033f 48894C24 		movq	%rcx, 8(%rsp)	# tmp274, %sfp
+ 1537      08
+ 1538              	.L174:
+ 1539              	# multithreaded_bitshift.cpp:92:     uint64_t lastFrom = nThreads != 1 ? (nThreads-1)*numPerThread 
+ 1540 0344 6683FD01 		cmpw	$1, %bp	#, nThreads.14_205
+ 1541 0348 0F849501 		je	.L200	#,
+ 1541      0000
+ 1542              	# multithreaded_bitshift.cpp:92:     uint64_t lastFrom = nThreads != 1 ? (nThreads-1)*numPerThread 
+ 1543 034e 4898     		cltq
+ 1544              	# multithreaded_bitshift.cpp:92:     uint64_t lastFrom = nThreads != 1 ? (nThreads-1)*numPerThread 
+ 1545 0350 480FAF44 		imulq	16(%rsp), %rax	# %sfp, _15
+ 1545      2410
+ 1546 0356 48890424 		movq	%rax, (%rsp)	# _15, %sfp
+ 1547              	.L185:
+ 1548              	# multithreaded_bitshift.cpp:93:     uint64_t lastTo = N-1;
+ 1549 035a 488B0500 		movq	N(%rip), %rax	# N, tmp335
+ 1549      000000
+ 1550              	# /usr/include/c++/9/thread:206: 	return _State_ptr{new _Impl{std::forward<_Callable>(__f)}};
+ 1551 0361 BF280000 		movl	$40, %edi	#,
+ 1551      00
+ 1552              	# /usr/include/c++/9/thread:82:       id() noexcept : _M_thread() { }
+ 1553 0366 48C74424 		movq	$0, 48(%rsp)	#, MEM[(struct id *)&D.74902]._M_thread
+ 1553      30000000 
+ 1553      00
+ 1554              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1555 036f 4C8B2500 		movq	thrFunc(%rip), %r12	# MEM[(void (*<Tc08d>) (long int, long int, short unsigned int) &)&thrFun
+ 1555      000000
+ 1556              	# multithreaded_bitshift.cpp:93:     uint64_t lastTo = N-1;
+ 1557 0376 488D58FF 		leaq	-1(%rax), %rbx	#, _40
+ 1558              	.LEHB4:
+ 1559              	# /usr/include/c++/9/thread:206: 	return _State_ptr{new _Impl{std::forward<_Callable>(__f)}};
+ 1560 037a E8000000 		call	_Znwm@PLT	#
+ 1560      00
+ 1561              	.LEHE4:
+ 1562              	# /usr/include/c++/9/thread:191: 	_State_impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__
+ 1563 037f 488D0D00 		leaq	16+_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE(%rip), %rcx	#, tmp336
+ 1563      000000
+ 1564              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1565 0386 4C896020 		movq	%r12, 32(%rax)	# _189, MEM[(struct _Head_base *)_196 + 32B]._M_head_impl
+ 1566 038a 66480F6E 		movq	%rbx, %xmm0	# _40, tmp238
+ 1566      C3
+ 1567              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1568 038f 4C8D6424 		leaq	48(%rsp), %r12	#, tmp273
+ 1568      30
+ 1569              	# /usr/include/c++/9/thread:191: 	_State_impl(_Callable&& __f) : _M_func(std::forward<_Callable>(__
+ 1570 0394 488908   		movq	%rcx, (%rax)	# tmp336, MEM[(struct _State_impl *)_196].D.82060._vptr._State
+ 1571              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1572 0397 0F160424 		movhps	(%rsp), %xmm0	# %sfp, tmp238
+ 1573              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1574 039b 488D7424 		leaq	56(%rsp), %rsi	#, tmp239
+ 1574      38
+ 1575 03a0 4C89E7   		movq	%r12, %rdi	# tmp273,
+ 1576              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1577 03a3 66896808 		movw	%bp, 8(%rax)	# nThreads.14_205, MEM[(struct _Head_base *)_196 + 8B]._M_head_impl
+ 1578              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1579 03a7 488B1500 		movq	pthread_create@GOTPCREL(%rip), %rdx	#,
+ 1579      000000
+ 1580              	# /usr/include/c++/9/tuple:133: 	: _M_head_impl(std::forward<_UHead>(__h)) { }
+ 1581 03ae 0F114010 		movups	%xmm0, 16(%rax)	# tmp238, MEM[(long unsigned int *)_196 + 16B]
+ 1582              	# /usr/include/c++/9/bits/unique_ptr.h:147:       __uniq_ptr_impl(pointer __p) : _M_t() { _M_ptr() 
+ 1583 03b2 48894424 		movq	%rax, 56(%rsp)	# tmp236, MEM[(struct _State * &)&D.89074]
+ 1583      38
+ 1584              	.LEHB5:
+ 1585              	# /usr/include/c++/9/thread:130:         _M_start_thread(_S_make_state(
+ 1586 03b7 E8000000 		call	_ZNSt6thread15_M_start_threadESt10unique_ptrINS_6_StateESt14default_deleteIS1_EEPFvvE@PLT	#
+ 1586      00
+ 1587              	.LEHE5:
+ 1588              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1589 03bc 488B7C24 		movq	56(%rsp), %rdi	# MEM[(struct _State * &)&D.89074], _190
+ 1589      38
+ 1590              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1591 03c1 4885FF   		testq	%rdi, %rdi	# _190
+ 1592 03c4 7406     		je	.L186	#,
+ 1593              	# /usr/include/c++/9/bits/unique_ptr.h:81: 	delete __ptr;
+ 1594 03c6 488B07   		movq	(%rdi), %rax	# _190->_vptr._State, _190->_vptr._State
+ 1595 03c9 FF5008   		call	*8(%rax)	# MEM[(int (*) () *)_191 + 8B]
+ 1596              	.L186:
+ 1597              	# /usr/include/c++/9/bits/vector.tcc:112: 	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_s
+ 1598 03cc 488B7424 		movq	72(%rsp), %rsi	# threads.D.74754._M_impl.D.74053._M_finish, _201
+ 1598      48
+ 1599              	# /usr/include/c++/9/bits/vector.tcc:112: 	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_s
+ 1600 03d1 483B7424 		cmpq	80(%rsp), %rsi	# threads.D.74754._M_impl.D.74053._M_end_of_storage, _201
+ 1600      50
+ 1601 03d6 0F84F101 		je	.L233	#,
+ 1601      0000
+ 1602              	# /usr/include/c++/9/thread:82:       id() noexcept : _M_thread() { }
+ 1603 03dc 48C70600 		movq	$0, (%rsi)	#, MEM[(struct id *)_201]._M_thread
+ 1603      000000
+ 1604              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1605 03e3 488B4424 		movq	48(%rsp), %rax	# MEM[(struct id &)&D.74902], MEM[(struct id &)&D.74902]
+ 1605      30
+ 1606              	# /usr/include/c++/9/bits/vector.tcc:117: 	    ++this->_M_impl._M_finish;
+ 1607 03e8 4883C608 		addq	$8, %rsi	#, tmp249
+ 1608              	# /usr/include/c++/9/bits/move.h:194:       __a = _GLIBCXX_MOVE(__b);
+ 1609 03ec 488946F8 		movq	%rax, -8(%rsi)	# MEM[(struct id &)&D.74902], MEM[(struct id *)_201]
+ 1610              	# /usr/include/c++/9/bits/vector.tcc:117: 	    ++this->_M_impl._M_finish;
+ 1611 03f0 48897424 		movq	%rsi, 72(%rsp)	# tmp249, threads.D.74754._M_impl.D.74053._M_finish
+ 1611      48
+ 1612              	.L191:
+ 1613              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1614 03f5 488B5424 		movq	64(%rsp), %rdx	# MEM[(struct thread * *)&threads], _107
+ 1614      40
+ 1615              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1616 03fa 31DB     		xorl	%ebx, %ebx	# i
+ 1617              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1618 03fc 31C9     		xorl	%ecx, %ecx	# _14
+ 1619              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1620 03fe 483B5424 		cmpq	72(%rsp), %rdx	# MEM[(struct thread * *)&threads + 8B], _107
+ 1620      48
+ 1621 0403 7428     		je	.L195	#,
+ 1622              		.p2align 4,,10
+ 1623 0405 0F1F00   		.p2align 3
+ 1624              	.L193:
+ 1625              	# /usr/include/c++/9/bits/stl_vector.h:1043: 	return *(this->_M_impl._M_start + __n);
+ 1626 0408 488D3CCA 		leaq	(%rdx,%rcx,8), %rdi	#, tmp257
+ 1627              	.LEHB6:
+ 1628              	# multithreaded_bitshift.cpp:97:         threads[i].join();
+ 1629 040c E8000000 		call	_ZNSt6thread4joinEv@PLT	#
+ 1629      00
+ 1630              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1631 0411 488B5424 		movq	64(%rsp), %rdx	# MEM[(struct thread * *)&threads], _107
+ 1631      40
+ 1632              	# /usr/include/c++/9/bits/stl_vector.h:916:       { return size_type(this->_M_impl._M_finish - this
+ 1633 0416 488B4424 		movq	72(%rsp), %rax	# MEM[(struct thread * *)&threads + 8B], tmp258
+ 1633      48
+ 1634              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1635 041b 83C301   		addl	$1, %ebx	#, i
+ 1636              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1637 041e 0FB7CB   		movzwl	%bx, %ecx	# i, _14
+ 1638              	# /usr/include/c++/9/bits/stl_vector.h:916:       { return size_type(this->_M_impl._M_finish - this
+ 1639 0421 4829D0   		subq	%rdx, %rax	# _107, tmp258
+ 1640 0424 48C1F803 		sarq	$3, %rax	#, tmp261
+ 1641              	# multithreaded_bitshift.cpp:96:     for (uint16_t i = 0; i < threads.size(); i++) {
+ 1642 0428 4839C1   		cmpq	%rax, %rcx	# tmp261, _14
+ 1643 042b 72DB     		jb	.L193	#,
+ 1644              	.L195:
+ 1645              	# multithreaded_bitshift.cpp:99:     auto end = std::chrono::high_resolution_clock::now();
+ 1646 042d E8000000 		call	_ZNSt6chrono3_V212system_clock3nowEv@PLT	#
+ 1646      00
+ 1647              	# /usr/include/c++/9/chrono:469: 	return __cd(__cd(__lhs).count() - __cd(__rhs).count());
+ 1648 0432 482B4424 		subq	24(%rsp), %rax	# %sfp, tmp252
+ 1648      18
+ 1649              	# /usr/include/c++/9/chrono:153: 	      static_cast<_CR>(__d.count()) / static_cast<_CR>(_CF::den))
+ 1650 0437 B940420F 		movl	$1000000, %ecx	#, tmp255
+ 1650      00
+ 1651              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1652 043c 488D3500 		leaq	.LC13(%rip), %rsi	#,
+ 1652      000000
+ 1653              	# /usr/include/c++/9/chrono:153: 	      static_cast<_CR>(__d.count()) / static_cast<_CR>(_CF::den))
+ 1654 0443 4899     		cqto
+ 1655              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1656 0445 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1656      000000
+ 1657              	# /usr/include/c++/9/chrono:153: 	      static_cast<_CR>(__d.count()) / static_cast<_CR>(_CF::den))
+ 1658 044c 48F7F9   		idivq	%rcx	# tmp255
+ 1659              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1660 044f BA0C0000 		movl	$12, %edx	#,
+ 1660      00
+ 1661              	# /usr/include/c++/9/chrono:153: 	      static_cast<_CR>(__d.count()) / static_cast<_CR>(_CF::den))
+ 1662 0454 4889C5   		movq	%rax, %rbp	# tmp252, tmp253
+ 1663              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1664 0457 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1664      00
+ 1665              	# multithreaded_bitshift.cpp:103:     std::cout << "Time to run " << N-1 << " numbers: " << exectim
+ 1666 045c 488B0500 		movq	N(%rip), %rax	# N, tmp341
+ 1666      000000
+ 1667              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1668 0463 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1668      000000
+ 1669              	# multithreaded_bitshift.cpp:103:     std::cout << "Time to run " << N-1 << " numbers: " << exectim
+ 1670 046a 488D70FF 		leaq	-1(%rax), %rsi	#, tmp262
+ 1671              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1672 046e E8000000 		call	_ZNSo9_M_insertIlEERSoT_@PLT	#
+ 1672      00
+ 1673              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1674 0473 BA0A0000 		movl	$10, %edx	#,
+ 1674      00
+ 1675 0478 488D3500 		leaq	.LC14(%rip), %rsi	#,
+ 1675      000000
+ 1676 047f 4889C7   		movq	%rax, %rdi	# _124,
+ 1677              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1678 0482 4989C4   		movq	%rax, %r12	# tmp300, _124
+ 1679              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1680 0485 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1680      00
+ 1681              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1682 048a 4889EE   		movq	%rbp, %rsi	# tmp253,
+ 1683 048d 4C89E7   		movq	%r12, %rdi	# _124,
+ 1684 0490 E8000000 		call	_ZNSo9_M_insertIlEERSoT_@PLT	#
+ 1684      00
+ 1685              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1686 0495 BA030000 		movl	$3, %edx	#,
+ 1686      00
+ 1687 049a 488D3500 		leaq	.LC15(%rip), %rsi	#,
+ 1687      000000
+ 1688 04a1 4889C7   		movq	%rax, %rdi	# _125,
+ 1689              	# /usr/include/c++/9/ostream:167:       { return _M_insert(__n); }
+ 1690 04a4 4889C5   		movq	%rax, %rbp	# tmp301, _125
+ 1691              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1692 04a7 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1692      00
+ 1693              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1694 04ac 4889EF   		movq	%rbp, %rdi	# _125,
+ 1695 04af E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1695      00
+ 1696              	.LEHE6:
+ 1697              	# multithreaded_bitshift.cpp:75:     std::vector<std::thread> threads;
+ 1698 04b4 488B7C24 		movq	8(%rsp), %rdi	# %sfp,
+ 1698      08
+ 1699 04b9 E8000000 		call	_ZNSt6vectorISt6threadSaIS0_EED1Ev	#
+ 1699      00
+ 1700              	# multithreaded_bitshift.cpp:109:     return 0;
+ 1701 04be 31C0     		xorl	%eax, %eax	# <retval>
+ 1702              	.L163:
+ 1703              	# multithreaded_bitshift.cpp:110: }
+ 1704 04c0 488B4C24 		movq	88(%rsp), %rcx	# D.89132, tmp312
+ 1704      58
+ 1705 04c5 6448330C 		xorq	%fs:40, %rcx	# MEM[(<address-space-1> long unsigned int *)40B], tmp312
+ 1705      25280000 
+ 1705      00
+ 1706 04ce 0F851701 		jne	.L234	#,
+ 1706      0000
+ 1707 04d4 4883C468 		addq	$104, %rsp	#,
+ 1708              		.cfi_remember_state
+ 1709              		.cfi_def_cfa_offset 56
+ 1710 04d8 5B       		popq	%rbx	#
+ 1711              		.cfi_def_cfa_offset 48
+ 1712 04d9 5D       		popq	%rbp	#
+ 1713              		.cfi_def_cfa_offset 40
+ 1714 04da 415C     		popq	%r12	#
+ 1715              		.cfi_def_cfa_offset 32
+ 1716 04dc 415D     		popq	%r13	#
+ 1717              		.cfi_def_cfa_offset 24
+ 1718 04de 415E     		popq	%r14	#
+ 1719              		.cfi_def_cfa_offset 16
+ 1720 04e0 415F     		popq	%r15	#
+ 1721              		.cfi_def_cfa_offset 8
+ 1722 04e2 C3       		ret	
+ 1723              	.L200:
+ 1724              		.cfi_restore_state
+ 1725              	# multithreaded_bitshift.cpp:92:     uint64_t lastFrom = nThreads != 1 ? (nThreads-1)*numPerThread 
+ 1726 04e3 48C70424 		movq	$2, (%rsp)	#, %sfp
+ 1726      02000000 
+ 1727 04eb E96AFEFF 		jmp	.L185	#
+ 1727      FF
+ 1728              	.L230:
+ 1729              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1730 04f0 BA2C0000 		movl	$44, %edx	#,
+ 1730      00
+ 1731 04f5 488D3500 		leaq	.LC8(%rip), %rsi	#,
+ 1731      000000
+ 1732 04fc 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1732      000000
+ 1733              	.LEHB7:
+ 1734 0503 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1734      00
+ 1735              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1736 0508 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1736      000000
+ 1737 050f E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1737      00
+ 1738              	# multithreaded_bitshift.cpp:63:         return 2;
+ 1739 0514 B8020000 		movl	$2, %eax	#, <retval>
+ 1739      00
+ 1740 0519 EBA5     		jmp	.L163	#
+ 1741              	.L229:
+ 1742              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1743 051b BA2B0000 		movl	$43, %edx	#,
+ 1743      00
+ 1744 0520 488D3500 		leaq	.LC2(%rip), %rsi	#,
+ 1744      000000
+ 1745 0527 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1745      000000
+ 1746 052e E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1746      00
+ 1747              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1748 0533 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1748      000000
+ 1749 053a E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1749      00
+ 1750              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1751 053f BA340000 		movl	$52, %edx	#,
+ 1751      00
+ 1752 0544 488D3500 		leaq	.LC3(%rip), %rsi	#,
+ 1752      000000
+ 1753 054b 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1753      000000
+ 1754 0552 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1754      00
+ 1755 0557 BA200000 		movl	$32, %edx	#,
+ 1755      00
+ 1756 055c 488D3500 		leaq	.LC4(%rip), %rsi	#,
+ 1756      000000
+ 1757 0563 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1757      000000
+ 1758 056a E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1758      00
+ 1759              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1760 056f 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1760      000000
+ 1761 0576 E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1761      00
+ 1762              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1763 057b BA3A0000 		movl	$58, %edx	#,
+ 1763      00
+ 1764 0580 488D3500 		leaq	.LC5(%rip), %rsi	#,
+ 1764      000000
+ 1765 0587 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1765      000000
+ 1766 058e E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1766      00
+ 1767              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1768 0593 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1768      000000
+ 1769 059a E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1769      00
+ 1770              	# /usr/include/c++/9/ostream:570: 	__ostream_insert(__out, __s,
+ 1771 059f BA350000 		movl	$53, %edx	#,
+ 1771      00
+ 1772 05a4 488D3500 		leaq	.LC6(%rip), %rsi	#,
+ 1772      000000
+ 1773 05ab 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1773      000000
+ 1774 05b2 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@PLT	#
+ 1774      00
+ 1775              	# /usr/include/c++/9/ostream:113: 	return __pf(*this);
+ 1776 05b7 488D3D00 		leaq	_ZSt4cout(%rip), %rdi	#,
+ 1776      000000
+ 1777 05be E8000000 		call	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_@PLT	#
+ 1777      00
+ 1778              	.LEHE7:
+ 1779              	# multithreaded_bitshift.cpp:46:         return 1;
+ 1780 05c3 B8010000 		movl	$1, %eax	#, <retval>
+ 1780      00
+ 1781 05c8 E9F3FEFF 		jmp	.L163	#
+ 1781      FF
+ 1782              	.L233:
+ 1783              	# /usr/include/c++/9/bits/vector.tcc:121: 	  _M_realloc_insert(end(), std::forward<_Args>(__args)..
+ 1784 05cd 488B7C24 		movq	8(%rsp), %rdi	# %sfp,
+ 1784      08
+ 1785 05d2 4C89E2   		movq	%r12, %rdx	# tmp273,
+ 1786              	.LEHB8:
+ 1787 05d5 E8000000 		call	_ZNSt6vectorISt6threadSaIS0_EE17_M_realloc_insertIJS0_EEEvN9__gnu_cxx17__normal_iteratorIPS0_
+ 1787      00
+ 1788              	.LEHE8:
+ 1789              	# /usr/include/c++/9/thread:138:       if (joinable())
+ 1790 05da 48837C24 		cmpq	$0, 48(%rsp)	#, MEM[(const struct thread *)&D.74902]
+ 1790      3000
+ 1791 05e0 0F840FFE 		je	.L191	#,
+ 1791      FFFF
+ 1792 05e6 E94AFDFF 		jmp	.L192	#
+ 1792      FF
+ 1793              	.L234:
+ 1794              	# multithreaded_bitshift.cpp:110: }
+ 1795 05eb E8000000 		call	__stack_chk_fail@PLT	#
+ 1795      00
+ 1796              	.L205:
+ 1797 05f0 F30F1EFA 		endbr64	
+ 1798 05f4 4889C5   		movq	%rax, %rbp	# tmp296, tmp224
+ 1799 05f7 E9000000 		jmp	.L180	#
+ 1799      00
+ 1800              	.L203:
+ 1801 05fc F30F1EFA 		endbr64	
+ 1802 0600 4889C5   		movq	%rax, %rbp	# tmp302, tmp266
+ 1803 0603 E9000000 		jmp	.L196	#
+ 1803      00
+ 1804              	.L202:
+ 1805 0608 F30F1EFA 		endbr64	
+ 1806 060c 4889C5   		movq	%rax, %rbp	# tmp304, tmp223
+ 1807 060f E9000000 		jmp	.L182	#
+ 1807      00
+ 1808              	.L206:
+ 1809 0614 F30F1EFA 		endbr64	
+ 1810 0618 4889C5   		movq	%rax, %rbp	# tmp298, tmp246
+ 1811 061b E9000000 		jmp	.L189	#
+ 1811      00
+ 1812              	.L204:
+ 1813 0620 F30F1EFA 		endbr64	
+ 1814 0624 4889C5   		movq	%rax, %rbp	# tmp303, tmp268
+ 1815 0627 E9000000 		jmp	.L197	#
+ 1815      00
+ 1816              		.globl	__gxx_personality_v0
+ 1817              		.section	.gcc_except_table,"a",@progbits
+ 1818              	.LLSDA3598:
+ 1819 0000 FF       		.byte	0xff
+ 1820 0001 FF       		.byte	0xff
+ 1821 0002 01       		.byte	0x1
+ 1822 0003 37       		.uleb128 .LLSDACSE3598-.LLSDACSB3598
+ 1823              	.LLSDACSB3598:
+ 1824 0004 B301     		.uleb128 .LEHB0-.LFB3598
+ 1825 0006 05       		.uleb128 .LEHE0-.LEHB0
+ 1826 0007 00       		.uleb128 0
+ 1827 0008 00       		.uleb128 0
+ 1828 0009 8802     		.uleb128 .LEHB1-.LFB3598
+ 1829 000b D702     		.uleb128 .LEHE1-.LEHB1
+ 1830 000d 880C     		.uleb128 .L202-.LFB3598
+ 1831 000f 00       		.uleb128 0
+ 1832 0010 9505     		.uleb128 .LEHB2-.LFB3598
+ 1833 0012 05       		.uleb128 .LEHE2-.LEHB2
+ 1834 0013 F00B     		.uleb128 .L205-.LFB3598
+ 1835 0015 00       		.uleb128 0
+ 1836 0016 A806     		.uleb128 .LEHB3-.LFB3598
+ 1837 0018 05       		.uleb128 .LEHE3-.LEHB3
+ 1838 0019 FC0B     		.uleb128 .L203-.LFB3598
+ 1839 001b 00       		.uleb128 0
+ 1840 001c FA06     		.uleb128 .LEHB4-.LFB3598
+ 1841 001e 05       		.uleb128 .LEHE4-.LEHB4
+ 1842 001f 880C     		.uleb128 .L202-.LFB3598
+ 1843 0021 00       		.uleb128 0
+ 1844 0022 B707     		.uleb128 .LEHB5-.LFB3598
+ 1845 0024 05       		.uleb128 .LEHE5-.LEHB5
+ 1846 0025 940C     		.uleb128 .L206-.LFB3598
+ 1847 0027 00       		.uleb128 0
+ 1848 0028 8C08     		.uleb128 .LEHB6-.LFB3598
+ 1849 002a A801     		.uleb128 .LEHE6-.LEHB6
+ 1850 002c 880C     		.uleb128 .L202-.LFB3598
+ 1851 002e 00       		.uleb128 0
+ 1852 002f 830A     		.uleb128 .LEHB7-.LFB3598
+ 1853 0031 C001     		.uleb128 .LEHE7-.LEHB7
+ 1854 0033 00       		.uleb128 0
+ 1855 0034 00       		.uleb128 0
+ 1856 0035 D50B     		.uleb128 .LEHB8-.LFB3598
+ 1857 0037 05       		.uleb128 .LEHE8-.LEHB8
+ 1858 0038 A00C     		.uleb128 .L204-.LFB3598
+ 1859 003a 00       		.uleb128 0
+ 1860              	.LLSDACSE3598:
+ 1861              		.section	.text.startup
+ 1862              		.cfi_endproc
+ 1863              		.section	.text.unlikely
+ 1864              		.cfi_startproc
+ 1865              		.cfi_personality 0x9b,DW.ref.__gxx_personality_v0
+ 1866              		.cfi_lsda 0x1b,.LLSDAC3598
+ 1868              	main.cold:
+ 1869              	.LFSB3598:
+ 1870              	.L180:
+ 1871              		.cfi_def_cfa_offset 160
+ 1872              		.cfi_offset 3, -56
+ 1873              		.cfi_offset 6, -48
+ 1874              		.cfi_offset 12, -40
+ 1875              		.cfi_offset 13, -32
+ 1876              		.cfi_offset 14, -24
+ 1877              		.cfi_offset 15, -16
+ 1878              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1879 0000 488B7C24 		movq	56(%rsp), %rdi	# MEM[(struct _State * &)&D.89060], _173
+ 1879      38
+ 1880              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1881 0005 4885FF   		testq	%rdi, %rdi	# _173
+ 1882 0008 7406     		je	.L182	#,
+ 1883              	# /usr/include/c++/9/bits/unique_ptr.h:81: 	delete __ptr;
+ 1884 000a 488B07   		movq	(%rdi), %rax	# _173->_vptr._State, _173->_vptr._State
+ 1885 000d FF5008   		call	*8(%rax)	# MEM[(int (*) () *)_174 + 8B]
+ 1886              	.L182:
+ 1887              	# multithreaded_bitshift.cpp:75:     std::vector<std::thread> threads;
+ 1888 0010 488B7C24 		movq	8(%rsp), %rdi	# %sfp,
+ 1888      08
+ 1889 0015 E8000000 		call	_ZNSt6vectorISt6threadSaIS0_EED1Ev	#
+ 1889      00
+ 1890 001a 4889EF   		movq	%rbp, %rdi	# tmp223,
+ 1891              	.LEHB9:
+ 1892 001d E8000000 		call	_Unwind_Resume@PLT	#
+ 1892      00
+ 1893              	.LEHE9:
+ 1894              	.L196:
+ 1895              	# /usr/include/c++/9/thread:138:       if (joinable())
+ 1896 0022 48837C24 		cmpq	$0, 40(%rsp)	#, MEM[(const struct thread *)&D.74899]
+ 1896      2800
+ 1897 0028 74E6     		je	.L182	#,
+ 1898 002a E9000000 		jmp	.L192	#
+ 1898      00
+ 1899              	.L197:
+ 1900 002f 48837C24 		cmpq	$0, 48(%rsp)	#, MEM[(const struct thread *)&D.74902]
+ 1900      3000
+ 1901 0035 74D9     		je	.L182	#,
+ 1902 0037 E9000000 		jmp	.L192	#
+ 1902      00
+ 1903              	.L189:
+ 1904              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1905 003c 488B7C24 		movq	56(%rsp), %rdi	# MEM[(struct _State * &)&D.89074], _193
+ 1905      38
+ 1906              	# /usr/include/c++/9/bits/unique_ptr.h:291: 	if (__ptr != nullptr)
+ 1907 0041 4885FF   		testq	%rdi, %rdi	# _193
+ 1908 0044 74CA     		je	.L182	#,
+ 1909              	# /usr/include/c++/9/bits/unique_ptr.h:81: 	delete __ptr;
+ 1910 0046 488B07   		movq	(%rdi), %rax	# _193->_vptr._State, _193->_vptr._State
+ 1911 0049 FF5008   		call	*8(%rax)	# MEM[(int (*) () *)_194 + 8B]
+ 1912              	# /usr/include/c++/9/bits/unique_ptr.h:82:       }
+ 1913 004c EBC2     		jmp	.L182	#
+ 1914              		.cfi_endproc
+ 1915              	.LFE3598:
+ 1916              		.section	.gcc_except_table
+ 1917              	.LLSDAC3598:
+ 1918 003b FF       		.byte	0xff
+ 1919 003c FF       		.byte	0xff
+ 1920 003d 01       		.byte	0x1
+ 1921 003e 04       		.uleb128 .LLSDACSEC3598-.LLSDACSBC3598
+ 1922              	.LLSDACSBC3598:
+ 1923 003f 1D       		.uleb128 .LEHB9-.LCOLDB16
+ 1924 0040 05       		.uleb128 .LEHE9-.LEHB9
+ 1925 0041 00       		.uleb128 0
+ 1926 0042 00       		.uleb128 0
+ 1927              	.LLSDACSEC3598:
+ 1928              		.section	.text.unlikely
+ 1929              		.section	.text.startup
+ 1931              		.section	.text.unlikely
+ 1933              	.LCOLDE16:
+ 1934              		.section	.text.startup
+ 1935              	.LHOTE16:
+ 1936 062c 0F1F4000 		.p2align 4
+ 1938              	_GLOBAL__sub_I_memo:
+ 1939              	.LFB4494:
+ 1940              		.cfi_startproc
+ 1941 0630 F30F1EFA 		endbr64	
+ 1942 0634 4883EC08 		subq	$8, %rsp	#,
+ 1943              		.cfi_def_cfa_offset 16
+ 1944              	# /usr/include/c++/9/iostream:74:   static ios_base::Init __ioinit;
+ 1945 0638 488D3D00 		leaq	_ZStL8__ioinit(%rip), %rdi	#,
+ 1945      000000
+ 1946 063f E8000000 		call	_ZNSt8ios_base4InitC1Ev@PLT	#
+ 1946      00
+ 1947 0644 488B3D00 		movq	_ZNSt8ios_base4InitD1Ev@GOTPCREL(%rip), %rdi	#,
+ 1947      000000
+ 1948              	# multithreaded_bitshift.cpp:184: }
+ 1949 064b 4883C408 		addq	$8, %rsp	#,
+ 1950              		.cfi_def_cfa_offset 8
+ 1951              	# /usr/include/c++/9/iostream:74:   static ios_base::Init __ioinit;
+ 1952 064f 488D1500 		leaq	__dso_handle(%rip), %rdx	#,
+ 1952      000000
+ 1953 0656 488D3500 		leaq	_ZStL8__ioinit(%rip), %rsi	#,
+ 1953      000000
+ 1954 065d E9000000 		jmp	__cxa_atexit@PLT	#
+ 1954      00
+ 1955              		.cfi_endproc
+ 1956              	.LFE4494:
+ 1958              		.section	.init_array,"aw"
+ 1959              		.align 8
+ 1960 0000 00000000 		.quad	_GLOBAL__sub_I_memo
+ 1960      00000000 
+ 1961              		.weak	_ZTSNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE
+ 1962              		.section	.rodata._ZTSNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE,"aG",@progbit
+ 1963              		.align 32
+ 1966              	_ZTSNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE:
+ 1967 0000 4E537436 		.string	"NSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE"
+ 1967      74687265 
+ 1967      61643131 
+ 1967      5F537461 
+ 1967      74655F69 
+ 1968              		.weak	_ZTINSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE
+ 1969              		.section	.data.rel.ro._ZTINSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE,"awG",@p
+ 1970              		.align 8
+ 1973              	_ZTINSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE:
+ 1974              	# <anonymous>:
+ 1975              	# <anonymous>:
+ 1976 0000 00000000 		.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+ 1976      00000000 
+ 1977              	# <anonymous>:
+ 1978 0008 00000000 		.quad	_ZTSNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE
+ 1978      00000000 
+ 1979              	# <anonymous>:
+ 1980 0010 00000000 		.quad	_ZTINSt6thread6_StateE
+ 1980      00000000 
+ 1981              		.weak	_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE
+ 1982              		.section	.data.rel.ro.local._ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE,"a
+ 1983              		.align 8
+ 1986              	_ZTVNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE:
+ 1987 0000 00000000 		.quad	0
+ 1987      00000000 
+ 1988 0008 00000000 		.quad	_ZTINSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEEE
+ 1988      00000000 
+ 1989 0010 00000000 		.quad	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED1Ev
+ 1989      00000000 
+ 1990 0018 00000000 		.quad	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEED0Ev
+ 1990      00000000 
+ 1991 0020 00000000 		.quad	_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJPFvlltEmmtEEEEE6_M_runEv
+ 1991      00000000 
+ 1992              		.globl	thrFunc
+ 1993              		.section	.data.rel.local,"aw"
+ 1994              		.align 8
+ 1997              	thrFunc:
+ 1998 0000 00000000 		.quad	_Z13collatzThreadllt
+ 1998      00000000 
+ 1999              		.globl	recursive
+ 2000              		.bss
+ 2003              	recursive:
+ 2004 0000 00       		.zero	1
+ 2005              		.globl	nThreads
+ 2006 0001 00       		.align 2
+ 2009              	nThreads:
+ 2010 0002 0000     		.zero	2
+ 2011              		.globl	N
+ 2012 0004 00000000 		.align 8
+ 2015              	N:
+ 2016 0008 00000000 		.zero	8
+ 2016      00000000 
+ 2017              		.globl	memo
+ 2018              		.align 8
+ 2021              	memo:
+ 2022 0010 00000000 		.zero	8
+ 2022      00000000 
+ 2023              		.local	_ZStL8__ioinit
+ 2024              		.comm	_ZStL8__ioinit,1,1
+ 2025              		.hidden	DW.ref.__gxx_personality_v0
+ 2026              		.weak	DW.ref.__gxx_personality_v0
+ 2027              		.section	.data.rel.local.DW.ref.__gxx_personality_v0,"awG",@progbits,DW.ref.__gxx_personality_v0,c
+ 2028              		.align 8
+ 2031              	DW.ref.__gxx_personality_v0:
+ 2032 0000 00000000 		.quad	__gxx_personality_v0
+ 2032      00000000 
+ 2033              		.hidden	__dso_handle
+ 2034              		.ident	"GCC: (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0"
+ 2035              		.section	.note.GNU-stack,"",@progbits
+ 2036              		.section	.note.gnu.property,"a"
+ 2037              		.align 8
+ 2038 0000 04000000 		.long	 1f - 0f
+ 2039 0004 10000000 		.long	 4f - 1f
+ 2040 0008 05000000 		.long	 5
+ 2041              	0:
+ 2042 000c 474E5500 		.string	 "GNU"
+ 2043              	1:
+ 2044              		.align 8
+ 2045 0010 020000C0 		.long	 0xc0000002
+ 2046 0014 04000000 		.long	 3f - 2f
+ 2047              	2:
+ 2048 0018 03000000 		.long	 0x3
+ 2049              	3:
+ 2050 001c 00000000 		.align 8
+ 2051              	4:
