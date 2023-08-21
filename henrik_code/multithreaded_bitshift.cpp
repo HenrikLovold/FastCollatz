@@ -78,7 +78,10 @@ int main(int argc, char **argv) {
     // Print startup info
     std::cout << "Configuration: N = " << N-1 << ", nThreads = " << nThreads << std::endl;
     if (recursive) {
-        std::cout << "Warning: you are running the experimental recursive algorithm" << std::endl;
+        std::cout << "Recursive algorithm selected" << std::endl;
+    }
+    else {
+        std::cout << "Iterative algorithm selected" << std::endl;
     }
     std::cout << "" << std::endl;
 
